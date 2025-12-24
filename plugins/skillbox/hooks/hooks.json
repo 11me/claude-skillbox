@@ -1,0 +1,24 @@
+{
+  "hooks": [
+    {
+      "name": "skillbox-session-context",
+      "event": "SessionStart",
+      "command": "bash plugins/skillbox/scripts/hooks/session-context.sh"
+    },
+    {
+      "name": "skillbox-helm-prompt-guard",
+      "event": "UserPromptSubmit",
+      "command": "python3 plugins/skillbox/scripts/hooks/prompt-guard.py"
+    },
+    {
+      "name": "skillbox-secret-prevent",
+      "event": "PreToolUse",
+      "command": "python3 plugins/skillbox/scripts/hooks/pretool-secret-guard.py"
+    },
+    {
+      "name": "skillbox-stop-done-criteria",
+      "event": "Stop",
+      "command": "python3 plugins/skillbox/scripts/hooks/stop-done-criteria.py"
+    }
+  ]
+}

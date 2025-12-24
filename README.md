@@ -19,7 +19,44 @@ Personal skills marketplace for Claude Code.
 
 | Skill | Description |
 |-------|-------------|
-| *coming soon* | |
+| [helm-chart-developer](plugins/skillbox/skills/helm-chart-developer/) | Build production Helm charts with GitOps (Flux + Kustomize + ESO) |
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `/helm-scaffold` | Scaffold complete GitOps structure for a new app |
+| `/helm-validate` | Validate Helm chart (lint, template, dry-run) |
+| `/checkpoint` | Create checkpoint summary of current work |
+
+## Hooks
+
+| Hook | Event | Description |
+|------|-------|-------------|
+| session-context | SessionStart | Inject GitOps layout and rules |
+| prompt-guard | UserPromptSubmit | Block scaffold without required params |
+| secret-prevent | PreToolUse | Block secrets in values.yaml |
+| stop-done-criteria | Stop | Require validation before session end |
+
+## Structure
+
+```
+plugins/skillbox/
+├── skills/
+│   └── helm-chart-developer/
+│       ├── SKILL.md
+│       ├── reference-gitops-eso.md
+│       └── snippets/
+├── commands/
+│   ├── helm-scaffold.md
+│   ├── helm-validate.md
+│   └── checkpoint.md
+├── hooks/
+│   └── hooks.json
+└── scripts/
+    ├── validate-helm.sh
+    └── hooks/
+```
 
 ## Local Development
 
@@ -27,15 +64,16 @@ Personal skills marketplace for Claude Code.
 # Test plugin locally
 claude --plugin-dir ./plugins/skillbox
 
-# Validate
+# Validate marketplace
 /plugin validate .
 ```
 
 ## Adding a New Skill
 
-1. Create a directory in `plugins/skillbox/skills/<skill-name>/`
+1. Create directory: `plugins/skillbox/skills/<skill-name>/`
 2. Add `SKILL.md` (see `templates/SKILL.template.md`)
-3. Test locally with `claude --plugin-dir ./plugins/skillbox`
+3. Add supporting files (snippets, references)
+4. Test locally with `claude --plugin-dir ./plugins/skillbox`
 
 ## License
 
