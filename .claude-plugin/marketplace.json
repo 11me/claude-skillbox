@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "skillbox",
-      "source": "skillbox",
+      "source": "./plugins/skillbox",
       "description": "Personal reusable skills for Claude Code"
     }
   ]
