@@ -1,4 +1,4 @@
-# /checkpoint
+# /helm-checkpoint
 
 Create a checkpoint summary of current Helm chart work.
 
@@ -13,7 +13,7 @@ Generate `CHECKPOINT.md` documenting:
 ## Usage
 
 ```
-/checkpoint [app-name] [env]
+/helm-checkpoint [app-name] [env]
 ```
 
 ## Output
