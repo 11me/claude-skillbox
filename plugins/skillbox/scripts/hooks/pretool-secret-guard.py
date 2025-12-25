@@ -2,6 +2,7 @@
 """
 PreToolUse hook: blocks writing secrets to values.yaml.
 """
+
 import json
 import sys
 import re
@@ -58,8 +59,8 @@ def main():
                     "Use ExternalSecret to fetch secrets from AWS Secrets Manager:\n"
                     "1. Create ExternalSecret in overlay (apps/dev/<app>/secrets/)\n"
                     "2. Reference with secrets.existingSecretName in values.yaml"
-                )
-            }
+                ),
+            },
         }
         print(json.dumps(out))
     else:

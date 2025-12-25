@@ -2,6 +2,7 @@
 """
 UserPromptSubmit hook: blocks scaffold commands without required parameters.
 """
+
 import json
 import sys
 import re
@@ -12,7 +13,10 @@ def main():
     prompt = (data.get("prompt") or "").lower()
 
     # Check if this is a helm scaffold request
-    if not ("helm" in prompt and ("scaffold" in prompt or "chart" in prompt or "create" in prompt)):
+    if not (
+        "helm" in prompt
+        and ("scaffold" in prompt or "chart" in prompt or "create" in prompt)
+    ):
         # Not a scaffold request, allow
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit"}}))
         return
@@ -20,10 +24,14 @@ def main():
     missing = []
 
     # Check for required parameters
-    if not re.search(r"\bapp(name)?\b", prompt) and not re.search(r"\bname[=:]\s*\w+", prompt):
+    if not re.search(r"\bapp(name)?\b", prompt) and not re.search(
+        r"\bname[=:]\s*\w+", prompt
+    ):
         missing.append("appName")
 
-    if "namespace" not in prompt and not re.search(r"\b(dev|prod|stage|staging)\b", prompt):
+    if "namespace" not in prompt and not re.search(
+        r"\b(dev|prod|stage|staging)\b", prompt
+    ):
         missing.append("namespace/env")
 
     if "image" not in prompt and "repository" not in prompt:
@@ -45,8 +53,8 @@ def main():
                     "- image: Container image repository\n"
                     "- secretPath: AWS Secrets Manager path (e.g., project/dev/app)\n"
                     "- ingressHost: Ingress hostname (optional)"
-                )
-            }
+                ),
+            },
         }
         print(json.dumps(out))
     else:

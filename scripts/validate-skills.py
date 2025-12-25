@@ -14,6 +14,7 @@ from pathlib import Path
 # Try to use PyYAML if available, otherwise basic parsing
 try:
     import yaml
+
     HAS_YAML = True
 except ImportError:
     HAS_YAML = False
@@ -80,8 +81,11 @@ def parse_frontmatter(frontmatter: str) -> tuple[dict | None, list[str]]:
                 value = value.strip().strip('"').strip("'")
                 # Handle arrays
                 if value.startswith("[") and value.endswith("]"):
-                    value = [v.strip().strip('"').strip("'")
-                             for v in value[1:-1].split(",") if v.strip()]
+                    value = [
+                        v.strip().strip('"').strip("'")
+                        for v in value[1:-1].split(",")
+                        if v.strip()
+                    ]
                 data[key] = value
         return data, errors
 
@@ -104,9 +108,7 @@ def validate_name(name: str | None) -> list[str]:
         )
 
     if len(name) > MAX_NAME_LENGTH:
-        errors.append(
-            f"'name' exceeds {MAX_NAME_LENGTH} characters: {len(name)} chars"
-        )
+        errors.append(f"'name' exceeds {MAX_NAME_LENGTH} characters: {len(name)} chars")
 
     return errors
 
@@ -120,7 +122,9 @@ def validate_description(description: str | None) -> list[str]:
         return errors
 
     if not isinstance(description, str):
-        errors.append(f"'description' must be a string, got {type(description).__name__}")
+        errors.append(
+            f"'description' must be a string, got {type(description).__name__}"
+        )
         return errors
 
     if len(description) > MAX_DESCRIPTION_LENGTH:
@@ -169,7 +173,9 @@ def validate_allowed_tools(tools: str | list | None) -> list[str]:
     elif isinstance(tools, list):
         tool_list = tools
     else:
-        errors.append(f"'allowed-tools' must be a string or array, got {type(tools).__name__}")
+        errors.append(
+            f"'allowed-tools' must be a string or array, got {type(tools).__name__}"
+        )
         return errors
 
     for tool in tool_list:

@@ -5,6 +5,7 @@ repos:
     hooks:
       - id: check-yaml
         args: ['--unsafe']  # Allow custom YAML tags
+        exclude: 'snippets/.*\.yaml$'  # Exclude Helm templates
       - id: check-json
       - id: check-added-large-files
         args: ['--maxkb=500']

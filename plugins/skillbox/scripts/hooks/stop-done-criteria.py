@@ -2,9 +2,9 @@
 """
 Stop hook: blocks session end until validation is complete.
 """
+
 import json
 import sys
-import os
 from pathlib import Path
 
 
@@ -33,14 +33,12 @@ def main():
 
     # Check if /helm-validate was run in this session
     validate_ran = any(
-        "/helm-validate" in str(msg.get("content", ""))
-        for msg in transcript
+        "/helm-validate" in str(msg.get("content", "")) for msg in transcript
     )
 
     # Check if /checkpoint was run
     checkpoint_ran = any(
-        "/checkpoint" in str(msg.get("content", ""))
-        for msg in transcript
+        "/checkpoint" in str(msg.get("content", "")) for msg in transcript
     )
 
     # Check for existing checkpoint files
@@ -62,10 +60,10 @@ def main():
                 "hookEventName": "Stop",
                 "additionalContext": (
                     "Before ending session:\n"
-                    + "\n".join(warnings) +
-                    "\n\nRun the missing commands to complete the session."
-                )
-            }
+                    + "\n".join(warnings)
+                    + "\n\nRun the missing commands to complete the session."
+                ),
+            },
         }
         print(json.dumps(out))
     else:

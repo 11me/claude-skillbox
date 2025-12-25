@@ -3,6 +3,7 @@
 PreToolUse hook: requires user confirmation for git push.
 Deterministic - pure regex matching.
 """
+
 import json
 import sys
 import re
