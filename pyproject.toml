@@ -1,6 +1,6 @@
 [project]
 name = "claude-skillbox"
-version = "0.7.0"
+version = "0.8.0"
 description = "Personal skills marketplace for Claude Code"
 requires-python = ">=3.12"
 dependencies = [

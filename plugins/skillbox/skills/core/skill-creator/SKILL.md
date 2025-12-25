@@ -32,11 +32,13 @@ Before creating a skill:
 | Type | When to Use | Structure |
 |------|-------------|-----------|
 | Basic | Simple, focused capability | Just SKILL.md |
+| Enhanced | Complex with Do/Verify/Repair | SKILL.md with structured sections |
 | Multi-file | Complex with references | SKILL.md + reference files |
 | Full | Plugin integration needed | SKILL.md + commands + hooks |
 
 See templates:
 - [templates/basic-skill.md](templates/basic-skill.md)
+- [templates/enhanced-skill.md](templates/enhanced-skill.md) — **Recommended for complex skills**
 - [templates/multi-file-skill.md](templates/multi-file-skill.md)
 - [templates/full-skill-structure.md](templates/full-skill-structure.md)
 
@@ -105,6 +107,47 @@ For advanced usage, see [REFERENCE.md](REFERENCE.md).
 
 Claude reads additional files only when needed (progressive disclosure).
 
+### 6. Use Enhanced Template for Complex Skills
+
+For skills with validation, safety constraints, or multi-step workflows, use the **enhanced template**:
+
+**Core sections:**
+
+| Section | Purpose |
+|---------|---------|
+| Purpose / When to Use | Trigger scenarios |
+| Prerequisites | Required tools, files, environment |
+| Inputs | What skill expects (table format) |
+| Outputs | What skill produces (table format) |
+| Workflow (Do/Verify/Repair) | Three-phase execution pattern |
+| Guardrails | NEVER/MUST constraints |
+| Scope | In/Out of scope boundaries |
+
+**Do/Verify/Repair pattern:**
+```markdown
+## Workflow
+
+### Do (Execute)
+1. Perform the main task
+2. Create/modify artifacts
+
+### Verify (Validate)
+Run checks:
+- `command1` — validates X
+- `command2` — validates Y
+
+Acceptance:
+- [ ] All checks pass
+
+### Repair (If Verify Fails)
+1. Read error output
+2. Identify root cause
+3. Apply minimal fix
+4. Re-run Verify
+```
+
+See [templates/enhanced-skill.md](templates/enhanced-skill.md) for full template.
+
 ## Definition of Done
 
 Before completing skill creation:
@@ -153,13 +196,17 @@ Prompts that should activate this skill:
 6. "Review my skill for best practices"
 7. "Set up skill structure with commands and hooks"
 8. "Create a read-only skill with allowed-tools"
+9. "Create a skill with Do/Verify/Repair workflow"
+10. "Add guardrails to my skill"
 
 ## Related Files
 
 - [BEST-PRACTICES.md](BEST-PRACTICES.md) — Detailed authoring guidance
 - [FRONTMATTER-REFERENCE.md](FRONTMATTER-REFERENCE.md) — YAML frontmatter rules
 - [templates/](templates/) — Ready-to-use skill templates
+- [../_index.md](../_index.md) — Skills registry (all available skills)
 
 ## Version History
 
+- 2.0.0 — Added enhanced template with Do/Verify/Repair pattern, Inputs/Outputs, Guardrails, Prerequisites, Scope
 - 1.0.0 — Initial release with templates and best practices

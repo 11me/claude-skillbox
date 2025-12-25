@@ -127,6 +127,64 @@ allowed-tools: Read, Grep, Glob, Write, Edit
 - When set: Claude uses only specified tools without asking permission
 - When omitted: Claude asks for permission to use tools as normal
 
+---
+
+## Extended Optional Fields
+
+These fields are optional but recommended for complex skills.
+
+### globs (Auto-activation)
+
+See [globs](#globs) section above.
+
+### prerequisites
+
+**Purpose**: Documents required tools, files, or environment setup before skill can function.
+
+**Format**: Array of strings or YAML list.
+
+**Examples**:
+
+```yaml
+prerequisites:
+  - helm 3.14+
+  - kubectl with cluster access
+  - KUBECONFIG set or default context available
+```
+
+**Note**: This field is for documentation purposes. Claude will check for these requirements at runtime and report if missing.
+
+---
+
+### scope
+
+**Purpose**: Defines boundaries of what the skill does and doesn't do.
+
+**Format**: Comma-separated keywords or structured YAML.
+
+**Examples**:
+
+Simple keywords:
+```yaml
+scope: gitops, helm, kubernetes
+```
+
+Structured format (in SKILL.md body, not frontmatter):
+```markdown
+## Scope
+
+**In Scope:**
+- Creating Helm charts
+- Validating manifests
+- GitOps overlay structure
+
+**Out of Scope:**
+- CI/CD pipeline setup → use deployment-skill
+- Cluster provisioning → requires manual setup
+```
+
+**Note**: Scope boundaries help Claude understand when to use this skill vs. defer to another.
+
 ## Complete Frontmatter Examples
 
 ### Minimal (required fields only)

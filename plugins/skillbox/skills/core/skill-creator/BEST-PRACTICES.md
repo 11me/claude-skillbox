@@ -84,6 +84,136 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash
 | `Glob` | Find files by pattern |
 | `Bash` | Execute shell commands |
 
+## Recommended SKILL.md Structure
+
+For complex skills, use the **enhanced template** with these sections:
+
+### Core Sections
+
+| Section | Purpose | Required |
+|---------|---------|----------|
+| Purpose / When to Use | Triggers and scenarios | Yes |
+| Prerequisites | Tools, files, environment needed | Recommended |
+| Inputs | What skill expects from user | Recommended |
+| Outputs | What skill produces | Recommended |
+| Workflow (Do/Verify/Repair) | Three-phase process | Recommended |
+| Guardrails | NEVER/MUST constraints | Recommended |
+| Scope | In/out of scope boundaries | Optional |
+| Examples | Trigger prompts | Yes |
+| Version History | Change log | Yes |
+
+See [templates/enhanced-skill.md](templates/enhanced-skill.md) for full template.
+
+## Do/Verify/Repair Pattern
+
+Structure complex skills as three phases:
+
+```markdown
+## Workflow
+
+### Do (Execute)
+1. Perform the main task
+2. Create/modify artifacts
+3. Complete primary work
+
+### Verify (Validate)
+Run:
+- `lint command` — check syntax
+- `test command` — verify behavior
+
+Acceptance:
+- [ ] All checks pass
+- [ ] Output is correct
+
+### Repair (If Verify Fails)
+1. Read error output
+2. Identify root cause
+3. Apply minimal fix
+4. Re-run Verify
+5. Repeat until green
+```
+
+This pattern ensures skills don't just "do" — they validate and fix.
+
+## Inputs and Outputs
+
+Explicit contracts help Claude understand what's needed:
+
+```markdown
+## Inputs
+
+| Input | Required | Description |
+|-------|----------|-------------|
+| app_name | Yes | Application name for chart |
+| namespace | Yes | Kubernetes namespace |
+| image | No | Container image (default: app_name) |
+
+## Outputs
+
+| Output | Description |
+|--------|-------------|
+| Chart.yaml | Helm chart metadata |
+| values.yaml | Default values |
+| templates/ | Kubernetes manifests |
+```
+
+## Guardrails
+
+Use NEVER/MUST for non-negotiable rules:
+
+```markdown
+## Guardrails
+
+**NEVER:**
+- Never put secrets in values.yaml
+- Never use latest tag in production
+- Never skip validation before completing
+
+**MUST:**
+- Always run helm lint before finishing
+- Always use semantic versioning
+- Always document breaking changes
+```
+
+Guardrails are not suggestions — they're enforced rules.
+
+## Prerequisites
+
+Document what must exist before skill activates:
+
+```markdown
+## Prerequisites
+
+**Required tools:**
+- helm 3.14+
+- kubectl with cluster access
+
+**Required files:**
+- Chart.yaml in current directory
+- values.yaml with base configuration
+
+**Environment:**
+- KUBECONFIG set or default context available
+```
+
+## Scope Boundaries
+
+Prevent skill overreach:
+
+```markdown
+## Scope
+
+**In Scope:**
+- Creating Helm charts
+- Validating manifests
+- GitOps overlay structure
+
+**Out of Scope:**
+- CI/CD pipeline setup → use deployment-skill
+- Cluster provisioning → requires manual setup
+- Secret management → use external-secrets-skill
+```
+
 ## Structuring Instructions
 
 ### Use Clear Headings
