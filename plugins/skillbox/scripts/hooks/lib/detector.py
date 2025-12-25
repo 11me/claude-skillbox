@@ -15,8 +15,7 @@ def detect_project_types(cwd: Path | None = None) -> dict[str, bool]:
         "helm": (cwd / "Chart.yaml").exists(),
         "gitops": (cwd / "clusters").is_dir()
         or ((cwd / "apps").is_dir() and (cwd / "charts").is_dir()),
-        "kustomize": (cwd / "kustomization.yaml").exists()
-        or (cwd / "kustomization.yml").exists(),
+        "kustomize": (cwd / "kustomization.yaml").exists() or (cwd / "kustomization.yml").exists(),
         "go": (cwd / "go.mod").exists(),
         "python": (cwd / "pyproject.toml").exists()
         or (cwd / "requirements.txt").exists()

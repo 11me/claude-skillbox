@@ -25,7 +25,9 @@ def check_command_exists(cmd: str) -> bool:
     """Check if a command exists in PATH."""
     try:
         subprocess.run(
-            ["which", cmd], capture_output=True, check=True  # noqa: S603, S607
+            ["which", cmd],
+            capture_output=True,
+            check=True,  # noqa: S603, S607
         )
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
