@@ -5,15 +5,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-context.sh"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session_context.py"
           },
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/flow-check.sh"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/flow_check.py"
           },
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/skill-suggester.sh"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/skill_suggester.py"
           }
         ]
       }

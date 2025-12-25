@@ -1,0 +1,83 @@
+"""Project type detection utilities."""
+
+from pathlib import Path
+
+
+def detect_project_types(cwd: Path | None = None) -> dict[str, bool]:
+    """Detect project types based on marker files.
+
+    Returns:
+        Dictionary with project type as key and boolean as value.
+    """
+    cwd = cwd or Path.cwd()
+
+    return {
+        "helm": (cwd / "Chart.yaml").exists(),
+        "gitops": (cwd / "clusters").is_dir()
+        or ((cwd / "apps").is_dir() and (cwd / "charts").is_dir()),
+        "kustomize": (cwd / "kustomization.yaml").exists()
+        or (cwd / "kustomization.yml").exists(),
+        "go": (cwd / "go.mod").exists(),
+        "python": (cwd / "pyproject.toml").exists()
+        or (cwd / "requirements.txt").exists()
+        or (cwd / "setup.py").exists(),
+        "node": (cwd / "package.json").exists(),
+        "rust": (cwd / "Cargo.toml").exists(),
+        "beads": (cwd / ".beads").is_dir(),
+        "serena": (cwd / ".serena").is_dir(),
+    }
+
+
+def detect_flux(cwd: Path | None = None) -> bool:
+    """Detect Flux GitOps by searching for Flux CRDs."""
+    cwd = cwd or Path.cwd()
+
+    for yaml_file in cwd.rglob("*.yaml"):
+        try:
+            content = yaml_file.read_text(errors="ignore")
+            if "helm.toolkit.fluxcd.io" in content:
+                return True
+        except (OSError, PermissionError):
+            continue
+
+    return False
+
+
+def has_tests(cwd: Path | None = None) -> bool:
+    """Check if project has tests."""
+    cwd = cwd or Path.cwd()
+
+    # Check test directories
+    for test_dir in ["tests", "test", "__tests__", "spec"]:
+        if (cwd / test_dir).is_dir():
+            return True
+
+    # Check test file patterns
+    patterns = ["*_test.go", "*_test.py", "*.test.ts", "*.spec.ts", "test_*.py"]
+    for pattern in patterns:
+        if list(cwd.glob(pattern)):
+            return True
+
+    return False
+
+
+def detect_python_framework(cwd: Path | None = None) -> str | None:
+    """Detect Python framework if any."""
+    cwd = cwd or Path.cwd()
+
+    files_to_check = [cwd / "pyproject.toml", cwd / "requirements.txt"]
+
+    for file_path in files_to_check:
+        if file_path.exists():
+            try:
+                content = file_path.read_text(errors="ignore").lower()
+                if "fastapi" in content:
+                    return "FastAPI"
+                if "django" in content:
+                    return "Django"
+                if "flask" in content:
+                    return "Flask"
+            except (OSError, PermissionError):
+                continue
+
+    return None

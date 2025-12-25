@@ -45,11 +45,13 @@ Personal skills marketplace for Claude Code.
 
 ## Hooks
 
+All hooks are written in Python. See [HOOKS.md](plugins/skillbox/HOOKS.md) for development guide.
+
 | Hook | Event | Description |
 |------|-------|-------------|
-| session-context | SessionStart | Inject date, project context, beads status |
-| flow-check | SessionStart | Check workflow compliance (CLAUDE.md, pre-commit) |
-| skill-suggester | SessionStart | Auto-detect project type and suggest skills |
+| session_context | SessionStart | Inject date, project context, beads status |
+| flow_check | SessionStart | Check workflow compliance (CLAUDE.md, pre-commit) |
+| skill_suggester | SessionStart | Auto-detect project type and suggest skills |
 | git-push-guard | PreToolUse:Bash | Require confirmation before git push |
 | pretool-secret-guard | PreToolUse:Write\|Edit | Block secrets in values.yaml |
 | prompt-guard | UserPromptSubmit | Block scaffold without required params |
@@ -91,12 +93,17 @@ plugins/skillbox/
 │   └── helm-checkpoint.md
 ├── hooks/
 │   └── hooks.json
+├── HOOKS.md
 └── scripts/
     ├── validate-helm.sh
     └── hooks/
-        ├── session-context.sh
-        ├── flow-check.sh
-        ├── skill-suggester.sh
+        ├── lib/
+        │   ├── __init__.py
+        │   ├── detector.py
+        │   └── response.py
+        ├── session_context.py
+        ├── flow_check.py
+        ├── skill_suggester.py
         ├── git-push-guard.py
         ├── pretool-secret-guard.py
         ├── prompt-guard.py
