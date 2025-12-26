@@ -139,8 +139,8 @@ def main() -> None:
             output_lines.append("```")
             output_lines.append("")
     elif bd_installed and not beads_initialized:
-        output_lines.append("**Task tracking:** beads CLI available but not initialized")
-        output_lines.append('→ Ask user: "Initialize beads for task tracking? (`bd init`)"')
+        output_lines.append("**Task tracking:** beads available but not initialized")
+        output_lines.append("→ Run `/init-project` for full setup, or `bd init` for beads only")
         output_lines.append("")
 
     # 5. GitOps rules reminder

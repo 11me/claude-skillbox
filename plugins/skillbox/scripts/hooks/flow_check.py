@@ -4,9 +4,10 @@
 Checks for:
 - CLAUDE.md presence
 - Pre-commit hooks installation
+- Beads initialization
 - Tests presence
 
-Note: Beads initialization is handled by session_context.py
+Suggests /init-project when multiple components missing.
 """
 
 import sys
@@ -44,18 +45,20 @@ def main() -> None:
         output_lines.append("Missing: .pre-commit-config.yaml")
         missing_count += 1
 
+    # Check beads initialization
+    beads_dir = cwd / ".beads"
+    if not beads_dir.is_dir():
+        output_lines.append("Missing: .beads/ (task tracking)")
+        missing_count += 1
+
     # Check tests
     if not has_tests(cwd):
         output_lines.append("No tests found: Consider adding tests/")
 
-    # Summary for multiple missing items
+    # Suggest /init-project when multiple components missing
     if missing_count >= 2:
         output_lines.append("")
-        output_lines.append("Suggestion: Multiple workflow components missing.")
-        output_lines.append("Consider running project initialization to set up:")
-        output_lines.append("- CLAUDE.md for AI context")
-        output_lines.append("- Pre-commit hooks for quality gates")
-        output_lines.append("- Beads for task tracking")
+        output_lines.append("**Quick fix:** Run `/init-project` to set up everything")
 
     # Output if there's something to report
     if output_lines:
