@@ -127,12 +127,20 @@ def main() -> None:
         output_lines.append("")
 
     # 4. Beads integration
-    bd_ready = get_beads_ready()
-    if bd_ready:
-        output_lines.append("**Ready tasks:**")
-        output_lines.append("```")
-        output_lines.append(bd_ready)
-        output_lines.append("```")
+    bd_installed = check_command_exists("bd")
+    beads_initialized = (cwd / ".beads").is_dir()
+
+    if bd_installed and beads_initialized:
+        bd_ready = get_beads_ready()
+        if bd_ready:
+            output_lines.append("**Ready tasks:**")
+            output_lines.append("```")
+            output_lines.append(bd_ready)
+            output_lines.append("```")
+            output_lines.append("")
+    elif bd_installed and not beads_initialized:
+        output_lines.append("**Task tracking:** beads CLI available but not initialized")
+        output_lines.append('→ Ask user: "Initialize beads for task tracking? (`bd init`)"')
         output_lines.append("")
 
     # 5. GitOps rules reminder

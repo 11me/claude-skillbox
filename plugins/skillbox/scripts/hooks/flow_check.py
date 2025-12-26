@@ -4,8 +4,9 @@
 Checks for:
 - CLAUDE.md presence
 - Pre-commit hooks installation
-- Beads initialization
 - Tests presence
+
+Note: Beads initialization is handled by session_context.py
 """
 
 import sys
@@ -42,11 +43,6 @@ def main() -> None:
     else:
         output_lines.append("Missing: .pre-commit-config.yaml")
         missing_count += 1
-
-    # Check beads initialization
-    beads_dir = cwd / ".beads"
-    if not beads_dir.is_dir():
-        output_lines.append("Optional: No .beads/ directory (task tracking)")
 
     # Check tests
     if not has_tests(cwd):
