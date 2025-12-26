@@ -1,4 +1,6 @@
-# Claude Code Instructions for claude-skillbox
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -16,6 +18,7 @@ This is a Claude Code plugin providing specialized workflows that complement Ant
 | Track tasks across sessions | `beads-workflow` (skillbox) |
 | Navigate code semantically | `serena-navigation` (skillbox) |
 | Create Helm charts | `helm-chart-developer` (skillbox) |
+| Scaffold Flux GitOps projects | `flux-gitops-scaffold` (skillbox) |
 | TDD workflow enforcement | `tdd-enforcer` (skillbox) |
 | Unified workflow (beads+serena+commit) | `workflow-orchestration` (skillbox) |
 
@@ -66,6 +69,7 @@ The README must accurately reflect:
 
 - `*.yaml` — Pure YAML files (validated by linters)
 - `*.template.yaml` — Go/Helm templates with `{{...}}` syntax (excluded from YAML validation)
+- `assets/charts/*/templates/*.yaml` — Helm chart templates (excluded from YAML linting, Go template syntax)
 - `*.md` — Markdown files
 - `SKILL.md` — Skill definition (required frontmatter: name, description)
 
