@@ -46,6 +46,28 @@
             "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/pretool-secret-guard.py"
           }
         ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/skills/k8s/flux-gitops-scaffold/scripts/validate-flux-manifest.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check if the written file is a HelmRelease (apiVersion: helm.toolkit.fluxcd.io/v2). If yes, verify the chart version is current. For external charts (sourceRef.kind: HelmRepository), suggest checking latest version via Context7. Return empty response if not a HelmRelease or version is likely current.",
+            "timeout": 30
+          }
+        ]
       }
     ],
     "Stop": [

@@ -3,7 +3,7 @@
 > Specialized workflow layer for Claude Code — cross-session task tracking, semantic code memory, platform engineering patterns.
 
 [![CI](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml/badge.svg)](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml)
-[![Version](https://img.shields.io/badge/version-0.17.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
+[![Version](https://img.shields.io/badge/version-0.18.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
 [![Python](https://img.shields.io/badge/python-3.12+-blue?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet?style=flat-square&logo=anthropic)](https://docs.anthropic.com/en/docs/claude-code)
@@ -49,6 +49,7 @@ claude --plugin-dir ./plugins/skillbox
 | Skill | Description |
 |-------|-------------|
 | [helm-chart-developer](plugins/skillbox/skills/k8s/helm-chart-developer/) | Production Helm charts with GitOps (Flux + Kustomize + ESO) |
+| [flux-gitops-scaffold](plugins/skillbox/skills/k8s/flux-gitops-scaffold/) | Scaffold Flux GitOps projects with image automation |
 
 ### Testing Excellence
 
@@ -93,6 +94,9 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | `/helm-scaffold` | Scaffold GitOps structure for app |
 | `/helm-validate` | Validate Helm chart |
 | `/helm-checkpoint` | Save current Helm work state |
+| `/flux-init` | Initialize Flux GitOps project |
+| `/flux-add-infra` | Add infrastructure component to GitOps |
+| `/flux-add-app` | Add application with image automation |
 
 ## Hooks
 
@@ -102,6 +106,8 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | skill_suggester | SessionStart | Auto-suggest relevant skills |
 | git-push-guard | PreToolUse | Confirm before git push |
 | pretool-secret-guard | PreToolUse | Block secrets in files |
+| validate-flux-manifest | PreToolUse | Validate Flux manifests (API versions, required fields) |
+| helmrelease-version-check | PostToolUse | Suggest checking HelmRelease chart versions |
 
 ## When to Use Skillbox vs Official Plugins
 
@@ -112,6 +118,7 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | Track tasks across sessions | `beads-workflow` (skillbox) |
 | Navigate code semantically | `serena-navigation` (skillbox) |
 | Create Helm charts | `helm-chart-developer` (skillbox) |
+| Scaffold Flux GitOps projects | `flux-gitops-scaffold` (skillbox) |
 | TDD workflow enforcement | `tdd-enforcer` (skillbox) |
 
 ## Architecture
@@ -129,7 +136,8 @@ plugins/skillbox/
 │   │   └── skill-patterns/
 │   ├── ts/                      # TypeScript (educational)
 │   └── k8s/                     # Platform engineering
-│       └── helm-chart-developer/
+│       ├── helm-chart-developer/
+│       └── flux-gitops-scaffold/
 ├── agents/                      # Autonomous agents
 ├── commands/                    # Slash commands
 ├── hooks/                       # Event hooks

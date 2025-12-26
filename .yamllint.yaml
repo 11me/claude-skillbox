@@ -38,5 +38,7 @@ rules:
 ignore: |
   # Ignore template snippets (they may have placeholders)
   plugins/skillbox/skills/*/snippets/
+  # Ignore Helm chart templates (Go template syntax is not valid YAML)
+  **/assets/charts/**/templates/
   # Ignore node_modules if present
   node_modules/
