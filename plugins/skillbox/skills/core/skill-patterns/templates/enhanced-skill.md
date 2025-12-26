@@ -1,12 +1,12 @@
 # Enhanced Skill Template
 
-Use this template for complex skills that need structured workflows, validation, and clear contracts.
+Complete template integrating all skill patterns.
 
 ## Directory Structure
 
 ```
 skill-name/
-├── SKILL.md              # Main skill definition
+├── SKILL.md              # Main skill definition (below)
 ├── REFERENCE.md          # Detailed documentation (optional)
 └── snippets/             # Code templates (optional)
 ```
@@ -119,13 +119,25 @@ Trigger prompts:
 
 ## When to Use This Template
 
-Choose **enhanced-skill** when:
+Choose **enhanced template** when:
 - Skill has multiple phases (do/verify/repair)
 - Clear input/output contracts are needed
 - Safety guardrails are important
 - Skill interacts with other skills
 
-Choose **basic-skill** when:
+Choose **basic template** (just frontmatter + Purpose + Examples) when:
 - Simple, single-purpose skill
 - No validation phase needed
-- Less than 100 lines of instructions
+- Less than 50 lines of instructions
+
+## Pattern Checklist
+
+Before completing a skill:
+
+- [ ] Prerequisites documented (if any)
+- [ ] Inputs/Outputs tables (if applicable)
+- [ ] Do/Verify/Repair workflow (if validation needed)
+- [ ] Guardrails defined (if safety-critical)
+- [ ] Scope boundaries clear (if risk of overreach)
+- [ ] Examples provided (always)
+- [ ] Version history started (always)

@@ -10,7 +10,7 @@ Quick lookup for available skills, triggers, and outputs.
 |-------|-------------|----------|---------|
 | [conventional-commit](core/conventional-commit/) | Git commits with Conventional Commits spec | "commit", "git message", "коммит" | Commit message |
 | [beads-workflow](core/beads-workflow/) | Task tracking with beads CLI | "task", "todo", "bd", "issue" | Task state |
-| [skill-creator](core/skill-creator/) | Create new Claude Code skills | "create skill", "scaffold skill" | SKILL.md |
+| [skill-patterns](core/skill-patterns/) | Quality patterns for robust skills | "improve skill", "add guardrails" | Pattern reference |
 | [serena-navigation](core/serena-navigation/) | Semantic code navigation | "serena", "find symbol", "symbol search" | Code insights, memories |
 | [context-engineering](core/context-engineering/) | AI context window management | "context overflow", "token limits" | Optimized context |
 | [tdd-enforcer](core/tdd-enforcer/) | TDD workflow patterns | "tdd", "red-green-refactor", "test first" | Test patterns |
@@ -43,7 +43,7 @@ Quick lookup for available skills, triggers, and outputs.
 | Track tasks/issues | beads-workflow |
 | Navigate codebase semantically | serena-navigation |
 | Create Helm chart | helm-chart-developer |
-| Create new skill | skill-creator |
+| Improve existing skill | skill-patterns |
 | Manage AI context | context-engineering |
 | TDD workflow | tdd-enforcer |
 | TypeScript project setup | ts-modern-tooling, ts-project-structure |
@@ -57,7 +57,7 @@ Quick lookup for available skills, triggers, and outputs.
 | `Chart.yaml`, `values.yaml` | helm-chart-developer |
 | `.beads/` | beads-workflow |
 | `.serena/` | serena-navigation |
-| `SKILL.md` | skill-creator |
+| `SKILL.md` | skill-patterns |
 | `*.ts`, `*.tsx` | ts-conventions, ts-type-patterns |
 | `tsconfig.json` | ts-project-structure |
 | `biome.json`, `vite.config.*` | ts-modern-tooling |
@@ -69,7 +69,7 @@ Quick lookup for available skills, triggers, and outputs.
 | Command | Skill/Action |
 |---------|--------------|
 | `/commit` | conventional-commit |
-| `/skill-scaffold` | skill-creator |
+| `/skill-scaffold` | skill-patterns |
 | `/helm-scaffold` | helm-chart-developer |
 | `/helm-validate` | helm-chart-developer |
 
@@ -94,4 +94,4 @@ context-engineering
 
 ## Adding New Skills
 
-See [skill-creator](core/skill-creator/) for templates and best practices.
+Use Anthropic's `plugin-dev` plugin to create new skills. For quality patterns (Do/Verify/Repair, Guardrails), see [skill-patterns](core/skill-patterns/).

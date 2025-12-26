@@ -3,7 +3,7 @@
 > Extensible skills marketplace for Claude Code — automate Helm/GitOps workflows, semantic code navigation, conventional commits, and more.
 
 [![CI](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml/badge.svg)](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml)
-[![Version](https://img.shields.io/badge/version-0.13.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
+[![Version](https://img.shields.io/badge/version-0.15.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
 [![Python](https://img.shields.io/badge/python-3.12+-blue?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet?style=flat-square&logo=anthropic)](https://docs.anthropic.com/en/docs/claude-code)
@@ -41,7 +41,7 @@ claude --plugin-dir ./plugins/skillbox
 | Skill | Description |
 |-------|-------------|
 | [conventional-commit](plugins/skillbox/skills/core/conventional-commit/) | Generate git commits following Conventional Commits spec |
-| [skill-creator](plugins/skillbox/skills/core/skill-creator/) | Create new Claude Code skills with proper structure |
+| [skill-patterns](plugins/skillbox/skills/core/skill-patterns/) | Quality patterns for robust skills (Do/Verify/Repair, Guardrails) |
 | [beads-workflow](plugins/skillbox/skills/core/beads-workflow/) | Task tracking with beads CLI |
 | [serena-navigation](plugins/skillbox/skills/core/serena-navigation/) | Semantic code navigation with Serena MCP |
 | [context-engineering](plugins/skillbox/skills/core/context-engineering/) | AI context window management and optimization |
@@ -127,7 +127,7 @@ plugins/skillbox/
 ├── skills/
 │   ├── core/                    # Core workflow skills
 │   │   ├── conventional-commit/
-│   │   ├── skill-creator/
+│   │   ├── skill-patterns/
 │   │   ├── beads-workflow/
 │   │   ├── serena-navigation/
 │   │   ├── context-engineering/
