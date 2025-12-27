@@ -39,7 +39,8 @@ infra/
 ### Vendored CRDs
 
 ```bash
-curl -sL https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.crds.yaml \
+# Use Context7 to get {VERSION} first!
+curl -sL https://github.com/cert-manager/cert-manager/releases/download/{VERSION}/cert-manager.crds.yaml \
   > infra/crds/cert-manager/crds.yaml
 ```
 
@@ -75,7 +76,7 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "v1.17.0"
+      version: "{VERSION}"  # Use Context7 to resolve
       sourceRef:
         kind: HelmRepository
         name: cert-manager
@@ -225,7 +226,7 @@ spec:
   chart:
     spec:
       chart: ingress-nginx
-      version: "4.12.0"
+      version: "{VERSION}"  # Use Context7 to resolve
       sourceRef:
         kind: HelmRepository
         name: ingress-nginx
@@ -280,7 +281,8 @@ infra/
 ### Vendored CRDs
 
 ```bash
-curl -sL https://raw.githubusercontent.com/external-secrets/external-secrets/v0.15.0/deploy/crds/bundle.yaml \
+# Use Context7 to get {VERSION} first!
+curl -sL https://raw.githubusercontent.com/external-secrets/external-secrets/{VERSION}/deploy/crds/bundle.yaml \
   > infra/crds/external-secrets/crds.yaml
 ```
 
@@ -308,7 +310,7 @@ spec:
   chart:
     spec:
       chart: external-secrets
-      version: "0.15.0"
+      version: "{VERSION}"  # Use Context7 to resolve
       sourceRef:
         kind: HelmRepository
         name: external-secrets

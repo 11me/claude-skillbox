@@ -245,11 +245,11 @@ resources:
 ### Vendoring CRDs
 
 ```bash
-# Download vendored CRDs from upstream releases
-curl -sL https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.crds.yaml \
+# Download vendored CRDs (use Context7 to get {VERSION} first!)
+curl -sL https://github.com/cert-manager/cert-manager/releases/download/{VERSION}/cert-manager.crds.yaml \
   > infra/crds/cert-manager/crds.yaml
 
-curl -sL https://raw.githubusercontent.com/external-secrets/external-secrets/v0.15.0/deploy/crds/bundle.yaml \
+curl -sL https://raw.githubusercontent.com/external-secrets/external-secrets/{VERSION}/deploy/crds/bundle.yaml \
   > infra/crds/external-secrets/crds.yaml
 ```
 
@@ -278,7 +278,7 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "v1.17.0"
+      version: "{VERSION}"  # Use Context7 to resolve
       sourceRef:
         kind: HelmRepository
         name: cert-manager

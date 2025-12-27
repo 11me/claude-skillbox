@@ -381,8 +381,8 @@ resources:
 **CRITICAL:** Vendor CRDs into repository. Do NOT use nested Flux Kustomizations for CRDs.
 
 ```bash
-# Download vendored CRDs
-curl -sL https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.crds.yaml \
+# Download vendored CRDs (use Context7 to get {VERSION} first!)
+curl -sL https://github.com/cert-manager/cert-manager/releases/download/{VERSION}/cert-manager.crds.yaml \
   > infra/crds/cert-manager/crds.yaml
 ```
 
