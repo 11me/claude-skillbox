@@ -20,12 +20,17 @@ resources:
 ---
 # How to vendor CRDs:
 #
+# CRITICAL: Use Context7 to get CURRENT versions before vendoring!
+#   1. resolve-library-id: libraryName="{component}"
+#   2. get-library-docs: topic="installation"
+#   3. Extract version from docs
+#
 # cert-manager:
-# curl -sL https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.crds.yaml \
+# curl -sL https://github.com/cert-manager/cert-manager/releases/download/{VERSION}/cert-manager.crds.yaml \
 #   > infra/crds/cert-manager/crds.yaml
 #
 # external-secrets:
-# curl -sL https://raw.githubusercontent.com/external-secrets/external-secrets/v0.15.0/deploy/crds/bundle.yaml \
+# curl -sL https://raw.githubusercontent.com/external-secrets/external-secrets/{VERSION}/deploy/crds/bundle.yaml \
 #   > infra/crds/external-secrets/crds.yaml
 #
 # CRITICAL: Vendor CRDs instead of using nested Flux Kustomizations to avoid race conditions

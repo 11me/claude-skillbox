@@ -1,8 +1,12 @@
 # Version Matrix Reference
 
-## Using Context7 for Latest Versions
+**CRITICAL:** Never hardcode versions. Always use Context7 to get current versions.
 
-Always fetch latest versions via Context7 before scaffolding:
+**Enforcement:** A PreToolUse hook blocks HelmRelease writes with empty version fields.
+
+## Using Context7 for Latest Versions (REQUIRED)
+
+**Mandatory workflow** - fetch latest versions via Context7 before scaffolding:
 
 ### Step 1: Resolve Library ID
 
@@ -31,9 +35,9 @@ Parameters:
 | external-dns | external-dns | /kubernetes-sigs/external-dns |
 | prometheus | kube-prometheus-stack | /prometheus-community/helm-charts |
 
-## Current Versions (as of Dec 2024)
+## Reference Versions (OUTDATED - DO NOT USE)
 
-**NOTE:** Always verify with Context7 - these may be outdated.
+**WARNING:** These versions are outdated. Always use Context7 to get current versions.
 
 | Component | Chart Version | App Version |
 |-----------|---------------|-------------|

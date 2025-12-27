@@ -101,7 +101,7 @@ Three workflows depending on component type:
 
 #### 2a. Add Controller (cert-manager, ingress-nginx, ESO)
 
-1. Get latest version via Context7
+1. **FIRST: Get latest version via Context7** (see Version Management section)
 2. Vendor CRDs to `infra/crds/{component}/`:
    - `kustomization.yaml` - Resources reference
    - `crds.yaml` - Vendored from upstream (curl from release)
@@ -126,7 +126,7 @@ Three workflows depending on component type:
 
 #### 2c. Add Service (redis, postgres)
 
-1. Get latest version via Context7
+1. **FIRST: Get latest version via Context7** (see Version Management section)
 2. Create `infra/base/services/{component}/`:
    - `kustomization.yaml` - Resources reference
    - `helm.yaml` - HelmRepository + HelmRelease
@@ -392,19 +392,37 @@ For HelmReleases with CRDs, disable CRD installation:
 installCRDs: false
 ```
 
-## Version Management
+## Version Management (REQUIRED)
 
-Use Context7 to fetch latest versions:
+**CRITICAL:** Never hardcode versions. Always use Context7 to get current versions.
+
+**Enforcement:** A PreToolUse hook blocks HelmRelease writes with empty version fields.
+
+### Workflow (Mandatory)
+
+Before creating ANY HelmRelease or vendoring CRDs:
 
 ```
 # Step 1: Resolve library ID
-resolve-library-id: libraryName="cert-manager"
+resolve-library-id: libraryName="{component}"
 
 # Step 2: Get docs with version info
-get-library-docs: context7CompatibleLibraryID="/jetstack/cert-manager", topic="helm installation"
+get-library-docs: context7CompatibleLibraryID="/{org}/{project}", topic="helm installation"
+
+# Step 3: Extract version and use in manifest
 ```
 
-See `references/version-matrix.md` for current versions.
+### Example: cert-manager
+
+```
+resolve-library-id: libraryName="cert-manager"
+# Returns: /jetstack/cert-manager
+
+get-library-docs: context7CompatibleLibraryID="/jetstack/cert-manager", topic="installation"
+# Extract version from: "helm install cert-manager --version vX.Y.Z"
+```
+
+See `references/version-matrix.md` for Context7 queries per component.
 
 ## Validation
 

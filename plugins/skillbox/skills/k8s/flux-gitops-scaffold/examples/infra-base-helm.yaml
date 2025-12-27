@@ -21,7 +21,7 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "v1.17.0"
+      version: ""  # REQUIRED: Use Context7 to resolve current version
       sourceRef:
         kind: HelmRepository
         name: cert-manager
