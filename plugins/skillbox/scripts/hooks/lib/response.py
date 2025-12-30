@@ -10,7 +10,16 @@ def session_output(message: str) -> None:
         message: The message to output (supports markdown).
     """
     if message:
-        print(json.dumps({"systemMessage": message}))
+        print(
+            json.dumps(
+                {
+                    "hookSpecificOutput": {
+                        "hookEventName": "SessionStart",
+                        "additionalContext": message,
+                    }
+                }
+            )
+        )
 
 
 def block(reason: str, event: str = "PreToolUse", context: str | None = None) -> None:
