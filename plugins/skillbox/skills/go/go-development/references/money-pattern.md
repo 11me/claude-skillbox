@@ -397,23 +397,53 @@ func (s *OrderService) CalculateTotal(items []Item) (*money.Money, error) {
 
 ## Database Storage
 
-Store as two columns: `amount TEXT` + `currency VARCHAR`:
+Store as two columns: `amount NUMERIC` + `currency VARCHAR`:
 
 ```sql
+-- Multi-currency (fiat + crypto) — high precision for all cases
 CREATE TABLE orders (
     id UUID PRIMARY KEY,
-    total_amount TEXT NOT NULL,      -- "99.99"
-    total_currency VARCHAR(10) NOT NULL,  -- "USD"
+    total_amount NUMERIC(32, 20) NOT NULL,
+    total_currency VARCHAR(10) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Fiat-only applications — standard precision
+CREATE TABLE payments (
+    id UUID PRIMARY KEY,
+    amount NUMERIC(12, 2) NOT NULL,
+    currency VARCHAR(10) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
+
+### Why NUMERIC instead of TEXT
+
+| Aspect | NUMERIC(32, 20) | TEXT |
+|--------|-----------------|------|
+| Type safety | PostgreSQL validates numbers | No validation |
+| Sorting | Correct numeric sort | Lexicographic sort (wrong!) |
+| Aggregations | SUM, AVG work directly | Must cast first |
+| Index efficiency | Better | Worse |
+| Storage | More compact | Larger |
+
+### Precision Guidelines
+
+| Currency Type | Recommended Type | Decimal Places | Example |
+|---------------|------------------|----------------|---------|
+| Fiat (USD, EUR) | NUMERIC(12, 2) | 2 | 99999999.99 |
+| Crypto (BTC) | NUMERIC(32, 8) | 8 | 21000000.00000000 |
+| Crypto (ETH) | NUMERIC(32, 18) | 18 | wei precision |
+| Multi-currency | NUMERIC(32, 20) | 20 | Universal |
+
+**Recommendation:** Use `NUMERIC(32, 20)` if your system handles multiple currency types including crypto. Use `NUMERIC(12, 2)` for fiat-only systems.
 
 ### Repository Pattern
 
 ```go
 type orderMapper struct {
     ID            uuid.UUID
-    TotalAmount   string  // scanned from TEXT
+    TotalAmount   string  // scanned as string from NUMERIC
     TotalCurrency string  // scanned from VARCHAR
     CreatedAt     time.Time
 }
@@ -426,19 +456,19 @@ func (m *orderMapper) toDomain() *Order {
     }
 }
 
-// Insert
+// Insert — amount stored directly as numeric
 func (r *OrderRepository) Create(ctx context.Context, order *Order) error {
     _, err := r.db.Exec(ctx, `
         INSERT INTO orders (id, total_amount, total_currency)
         VALUES ($1, $2, $3)
-    `, order.ID, string(order.Total.Amount), string(order.Total.Currency))
+    `, order.ID, order.Total.StringAmount(), string(order.Total.Currency))
     return err
 }
 
-// Select with type cast
+// Select — NUMERIC scans to string automatically
 func (r *OrderRepository) GetByID(ctx context.Context, id uuid.UUID) (*Order, error) {
     row := r.db.QueryRow(ctx, `
-        SELECT id, total_amount::text, total_currency, created_at
+        SELECT id, total_amount, total_currency, created_at
         FROM orders WHERE id = $1
     `, id)
 

@@ -220,6 +220,7 @@ go get github.com/exaring/otelpgx@latest
 
 ## Version
 
+- 1.6.1 — Money pattern: NUMERIC database storage (was TEXT)
 - 1.6.0 — Money pattern (decimal precision, currency conversion, exchange rates)
 - 1.5.0 — Enhanced testing (testcontainers, testify mock, CI/Local detection)
 - 1.4.0 — Entry point pattern (backend, errgroup, graceful shutdown)
