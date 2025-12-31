@@ -258,6 +258,7 @@ go get github.com/exaring/otelpgx@latest
 
 ## Version
 
+- 1.10.0 — Repository pattern: Save as upsert, UserColumns() function, Values() method
 - 1.9.0 — Authentication patterns (gateway-based, full JWT validation)
 - 1.8.0 — Code quality tools (deadcode analysis, make deadcode target)
 - 1.7.1 — Comment conventions (stdlib-style doc comments, no decorative separators)

@@ -264,29 +264,37 @@ func (m *secureUserMapper) ToModel() *User {
 
 // Usage:
 //
-//	func (r *userRepo) Create(ctx context.Context, user *User) error {
+//	// Save inserts or updates (upsert pattern).
+//	func (r *userRepo) Save(ctx context.Context, user *User) error {
 //	    m := NewUserMapper(user)
-//	    cols := UserColumns()
 //
-//	    query := sq.Insert("users").
-//	        Columns(cols...).
+//	    sql, args, err := sq.Insert("users").
+//	        Columns(UserColumns()...).
 //	        Values(m.Values()...).
-//	        PlaceholderFormat(sq.Dollar)
+//	        Suffix(`ON CONFLICT (id) DO UPDATE SET
+//	            name = EXCLUDED.name,
+//	            email = EXCLUDED.email,
+//	            balance_amount = EXCLUDED.balance_amount,
+//	            balance_currency = EXCLUDED.balance_currency`).
+//	        PlaceholderFormat(sq.Dollar).
+//	        ToSql()
+//	    if err != nil {
+//	        return err
+//	    }
 //
-//	    sql, args, _ := query.ToSql()
-//	    _, err := r.db.Exec(ctx, sql, args...)
+//	    _, err = r.db.Exec(ctx, sql, args...)
 //	    return err
 //	}
 //
+//	// FindByID returns a user by ID.
 //	func (r *userRepo) FindByID(ctx context.Context, id string) (*User, error) {
-//	    query := sq.Select(UserColumns()...).
+//	    sql, args, _ := sq.Select(UserColumns()...).
 //	        From("users").
 //	        Where(sq.Eq{"id": id}).
-//	        PlaceholderFormat(sq.Dollar)
+//	        PlaceholderFormat(sq.Dollar).
+//	        ToSql()
 //
-//	    sql, args, _ := query.ToSql()
-//
-//	    m := &userMapper{}
+//	    m := NewUserMapper(nil) // empty for scanning
 //	    err := r.db.QueryRow(ctx, sql, args...).Scan(m.ScanValues()...)
 //	    if err != nil {
 //	        return nil, err
@@ -295,7 +303,8 @@ func (m *secureUserMapper) ToModel() *User {
 //	    return m.ToModel(), nil
 //	}
 //
-//	func (r *userRepo) Update(ctx context.Context, id string, update *UserUpdate) error {
+//	// PartialUpdate updates only specified fields.
+//	func (r *userRepo) PartialUpdate(ctx context.Context, id string, update *UserUpdate) error {
 //	    m := NewUserUpdateMapper(update)
 //	    if !m.HasChanges() {
 //	        return nil

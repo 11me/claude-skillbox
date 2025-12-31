@@ -18,8 +18,7 @@ import (
 type UserRepository interface {
     FindByID(ctx context.Context, id string) (*models.User, error)
     FindByEmail(ctx context.Context, email string) (*models.User, error)
-    Create(ctx context.Context, user *models.User) error
-    Update(ctx context.Context, user *models.User) error
+    Save(ctx context.Context, users ...*models.User) error  // Upsert
     Delete(ctx context.Context, id string) error
 }
 ```
@@ -34,6 +33,7 @@ import (
     "errors"
     "time"
 
+    "github.com/google/uuid"
     "github.com/jackc/pgx/v5"
     sq "github.com/Masterminds/squirrel"
     "myapp/internal/common"
@@ -51,9 +51,14 @@ func NewUserRepository(db *postgres.Client) UserRepository {
     return &userRepository{db: db}
 }
 
+// UserColumns returns column names in consistent order.
+func UserColumns() []string {
+    return []string{"id", "name", "email", "created_at", "updated_at"}
+}
+
 func (r *userRepository) FindByID(ctx context.Context, id string) (*models.User, error) {
     query, args, err := psql.
-        Select("id", "name", "email", "created_at", "updated_at").
+        Select(UserColumns()...).
         From("users").
         Where(sq.Eq{"id": id}).
         ToSql()
@@ -65,16 +70,41 @@ func (r *userRepository) FindByID(ctx context.Context, id string) (*models.User,
     return scanUser(row)
 }
 
-func (r *userRepository) Create(ctx context.Context, user *models.User) error {
-    now := time.Now()
-    user.CreatedAt = now
-    user.UpdatedAt = now
+// Save inserts or updates users (upsert pattern).
+func (r *userRepository) Save(ctx context.Context, users ...*models.User) error {
+    if len(users) == 0 {
+        return nil
+    }
 
-    query, args, err := psql.
+    now := time.Now()
+
+    builder := psql.
         Insert("users").
-        Columns("id", "name", "email", "created_at", "updated_at").
-        Values(user.ID, user.Name, user.Email, user.CreatedAt, user.UpdatedAt).
-        ToSql()
+        Columns(UserColumns()...).
+        Suffix(`ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            email = EXCLUDED.email,
+            updated_at = EXCLUDED.updated_at`)
+
+    for _, user := range users {
+        if user.ID == "" {
+            user.ID = uuid.NewString()
+        }
+        if user.CreatedAt.IsZero() {
+            user.CreatedAt = now
+        }
+        user.UpdatedAt = now
+
+        builder = builder.Values(
+            user.ID,
+            user.Name,
+            user.Email,
+            user.CreatedAt,
+            user.UpdatedAt,
+        )
+    }
+
+    query, args, err := builder.ToSql()
     if err != nil {
         return err
     }

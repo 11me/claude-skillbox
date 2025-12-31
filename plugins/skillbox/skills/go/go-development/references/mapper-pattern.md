@@ -157,19 +157,22 @@ func (m *userMapper) IsEmpty() bool {
 
 ## Repository Usage
 
-### INSERT
+### Save (Upsert)
 
 ```go
-func (r *userRepo) Create(ctx context.Context, user *models.User) error {
+func (r *userRepo) Save(ctx context.Context, user *models.User) error {
     m := NewUserMapper(user)
-    cols := UserColumns()
 
-    query := sq.Insert("users").
-        Columns(cols...).
+    sql, args, err := sq.Insert("users").
+        Columns(UserColumns()...).
         Values(m.Values()...).
-        PlaceholderFormat(sq.Dollar)
-
-    sql, args, err := query.ToSql()
+        Suffix(`ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            email = EXCLUDED.email,
+            balance_amount = EXCLUDED.balance_amount,
+            balance_currency = EXCLUDED.balance_currency`).
+        PlaceholderFormat(sq.Dollar).
+        ToSql()
     if err != nil {
         return err
     }
@@ -242,26 +245,47 @@ func (r *userRepo) Find(ctx context.Context, filter *UserFilter) ([]*models.User
 }
 ```
 
-### UPDATE
+### Partial Update
+
+Use separate update mapper for partial updates when you need to update only specific fields:
 
 ```go
-func (r *userRepo) Update(ctx context.Context, user *models.User) error {
-    m := NewUserMapper(user)
+// userUpdateMapper handles partial updates.
+type userUpdateMapper struct {
+    name            *string
+    email           *string
+    balanceAmount   *string
+    balanceCurrency *string
+}
 
-    query := sq.Update("users").
-        Set("name", m.name).
-        Set("email", m.email).
-        Set("balance_amount", m.balanceAmount).
-        Set("balance_currency", m.balanceCurrency).
-        Where(sq.Eq{"id": m.id}).
-        PlaceholderFormat(sq.Dollar)
+func (m *userUpdateMapper) UpdateFields() map[string]any {
+    fields := make(map[string]any)
+    if m.name != nil {
+        fields["name"] = *m.name
+    }
+    if m.email != nil {
+        fields["email"] = *m.email
+    }
+    // ... other fields
+    return fields
+}
 
-    sql, args, err := query.ToSql()
-    if err != nil {
-        return err
+func (r *userRepo) PartialUpdate(ctx context.Context, id string, update *UserUpdate) error {
+    m := NewUserUpdateMapper(update)
+    if !m.HasChanges() {
+        return nil
     }
 
-    _, err = r.db.Exec(ctx, sql, args...)
+    qb := sq.Update("users").
+        Where(sq.Eq{"id": id}).
+        PlaceholderFormat(sq.Dollar)
+
+    for col, val := range m.UpdateFields() {
+        qb = qb.Set(col, val)
+    }
+
+    sql, args, _ := qb.ToSql()
+    _, err := r.db.Exec(ctx, sql, args...)
     return err
 }
 ```
