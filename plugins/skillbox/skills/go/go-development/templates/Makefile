@@ -18,7 +18,7 @@ GOMOD := $(GOCMD) mod
 BIN_DIR := bin
 CMD_DIR := cmd/app
 
-.PHONY: all build run test lint clean docker docker-push migrate help
+.PHONY: all build run test lint deadcode clean docker docker-push migrate help
 
 all: lint test build ## Run lint, test, and build
 
@@ -42,6 +42,10 @@ test-integration: ## Run integration tests
 lint: ## Run linter
 	@which golangci-lint > /dev/null || (echo "Installing golangci-lint..." && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
 	golangci-lint run ./...
+
+deadcode: ## Check for unreachable functions
+	@which deadcode > /dev/null 2>&1 || go install golang.org/x/tools/cmd/deadcode@latest
+	deadcode -test ./...
 
 fmt: ## Format code
 	$(GOCMD) fmt ./...
@@ -95,6 +99,7 @@ tools: ## Install development tools
 	go install github.com/pressly/goose/v3/cmd/goose@latest
 	go install github.com/air-verse/air@latest
 	go install golang.org/x/tools/cmd/goimports@latest
+	go install golang.org/x/tools/cmd/deadcode@latest
 
 help: ## Show this help
 	@echo "Usage: make [target]"

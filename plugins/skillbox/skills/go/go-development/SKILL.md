@@ -162,6 +162,7 @@ project/
 | Concurrency | [concurrency-pattern.md](references/concurrency-pattern.md) |
 | Common Pitfalls | [common-pitfalls.md](references/common-pitfalls.md) |
 | Performance | [performance-tips.md](references/performance-tips.md) |
+| Code Quality | [code-quality.md](references/code-quality.md) |
 
 ## Examples
 
@@ -254,6 +255,7 @@ go get github.com/exaring/otelpgx@latest
 
 ## Version
 
+- 1.8.0 — Code quality tools (deadcode analysis, make deadcode target)
 - 1.7.1 — Comment conventions (stdlib-style doc comments, no decorative separators)
 - 1.7.0 — Handler-per-entity, Optional[T], JSONB types, Mapper pattern, Config envPrefix, IDs as string
 - 1.6.1 — Money pattern: NUMERIC database storage (was TEXT)
