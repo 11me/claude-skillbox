@@ -7,15 +7,20 @@ import (
 )
 
 // Config is the main application configuration.
-// Uses envPrefix to cleanly scope nested struct env vars.
+// Uses only embedded structs with envPrefix for clean scoping.
 type Config struct {
-	AppName  string `env:"APP_NAME" envDefault:"myapp"`
-	LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
+	AppConfig    `envPrefix:"APP_"`
+	ServerConfig `envPrefix:"SERVER_"`
+	DBConfig     `envPrefix:"DB_"`
+	RedisConfig  `envPrefix:"REDIS_"`
+	QueueConfig  `envPrefix:"QUEUE_"`
+}
 
-	Server ServerConfig `envPrefix:"SERVER_"`
-	DB     DBConfig     `envPrefix:"DB_"`
-	Redis  RedisConfig  `envPrefix:"REDIS_"`
-	Queue  QueueConfig  `envPrefix:"QUEUE_"`
+// AppConfig holds application-level settings.
+// Env vars: APP_NAME, APP_LOG_LEVEL
+type AppConfig struct {
+	Name     string `env:"NAME" envDefault:"myapp"`
+	LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
 }
 
 // ServerConfig holds HTTP server settings.

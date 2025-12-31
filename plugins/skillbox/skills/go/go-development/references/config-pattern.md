@@ -13,14 +13,18 @@ import (
     "github.com/caarlos0/env/v10"
 )
 
+// Config uses only embedded structs with envPrefix.
 type Config struct {
-    AppName  string `env:"APP_NAME" envDefault:"myapp"`
-    LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
+    AppConfig    `envPrefix:"APP_"`
+    ServerConfig `envPrefix:"SERVER_"`
+    DBConfig     `envPrefix:"DB_"`
+    RedisConfig  `envPrefix:"REDIS_"`
+    QueueConfig  `envPrefix:"QUEUE_"`
+}
 
-    Server ServerConfig `envPrefix:"SERVER_"`
-    DB     DBConfig     `envPrefix:"DB_"`
-    Redis  RedisConfig  `envPrefix:"REDIS_"`
-    Queue  QueueConfig  `envPrefix:"QUEUE_"`
+type AppConfig struct {
+    Name     string `env:"NAME" envDefault:"myapp"`
+    LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
 }
 
 type ServerConfig struct {
@@ -66,43 +70,46 @@ func (c *DBConfig) DSN() string {
 }
 ```
 
-## Key Feature: envPrefix
+## Key Feature: envPrefix + Embedded Structs
 
-The `envPrefix` tag automatically prefixes all child struct env vars:
+The `envPrefix` tag with embedded structs provides:
+- Clean struct definition (type name only, no field name)
+- Method promotion (access `cfg.DSN()` instead of `cfg.DB.DSN()`)
+- Field promotion (access `cfg.ListenAddr` instead of `cfg.Server.ListenAddr`)
 
 ```go
 type Config struct {
-    Server ServerConfig `envPrefix:"SERVER_"`  // ← prefix defined here
+    ServerConfig `envPrefix:"SERVER_"`  // ← embedded struct
 }
 
 type ServerConfig struct {
     ListenAddr string `env:"LISTEN_ADDR"`  // → SERVER_LISTEN_ADDR
     UseTLS     bool   `env:"USE_TLS"`      // → SERVER_USE_TLS
 }
+
+// Access promoted fields directly
+cfg.ListenAddr  // instead of cfg.Server.ListenAddr
 ```
 
-### Without envPrefix (old way)
+### Named Fields (avoid)
 
 ```go
-// ❌ Verbose, error-prone
-type ServerConfig struct {
-    ListenAddr string `env:"SERVER_LISTEN_ADDR"`
-    UseTLS     bool   `env:"SERVER_USE_TLS"`
-}
-```
-
-### With envPrefix (new way)
-
-```go
-// ✅ Clean, prefix defined once
+// ❌ Named fields require accessor chain
 type Config struct {
     Server ServerConfig `envPrefix:"SERVER_"`
 }
+cfg.Server.ListenAddr
+```
 
-type ServerConfig struct {
-    ListenAddr string `env:"LISTEN_ADDR"`
-    UseTLS     bool   `env:"USE_TLS"`
+### Embedded Structs (preferred)
+
+```go
+// ✅ Embedded structs with field/method promotion
+type Config struct {
+    ServerConfig `envPrefix:"SERVER_"`
 }
+cfg.ListenAddr  // promoted
+cfg.ServerConfig.ListenAddr  // also works
 ```
 
 ## Environment Variables
@@ -111,8 +118,8 @@ The config above reads these env vars:
 
 | Struct | Field | Env Var |
 |--------|-------|---------|
-| Config | AppName | `APP_NAME` |
-| Config | LogLevel | `LOG_LEVEL` |
+| AppConfig | Name | `APP_NAME` |
+| AppConfig | LogLevel | `APP_LOG_LEVEL` |
 | ServerConfig | UseTLS | `SERVER_USE_TLS` |
 | ServerConfig | ListenAddr | `SERVER_LISTEN_ADDR` |
 | DBConfig | Host | `DB_HOST` |
@@ -147,13 +154,15 @@ func main() {
         log.Fatalf("config: %v", err)
     }
 
-    // Access nested configs
-    if cfg.DB.MigrationEnabled {
-        runMigrations(cfg.DB)
+    // Access promoted fields directly
+    log.Println("Starting", cfg.Name)
+
+    if cfg.MigrationEnabled {
+        runMigrations(cfg.DBConfig)
     }
 
-    // Use DSN helper
-    db, err := pgx.Connect(ctx, cfg.DB.DSN())
+    // Use promoted DSN method
+    db, err := pgx.Connect(ctx, cfg.DSN())
 }
 ```
 
@@ -161,8 +170,10 @@ func main() {
 
 ```bash
 # .env.example
+
+# App
 APP_NAME=myapp
-LOG_LEVEL=info
+APP_LOG_LEVEL=info
 
 # Server
 SERVER_USE_TLS=false
@@ -192,7 +203,8 @@ QUEUE_WORKERS=5
 
 | DO | DON'T |
 |----|-------|
-| Use `envPrefix` for nested structs | Repeat prefix in every field |
+| Use embedded structs in main Config | Use named fields like `Server ServerConfig` |
+| Use `envPrefix` for all embedded structs | Repeat prefix in every field |
 | Use `notEmpty` for required fields | Panic on missing config |
 | Provide sensible defaults | Require all values |
 | Keep related settings together | Scatter settings across structs |
