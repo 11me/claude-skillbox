@@ -27,6 +27,7 @@ Production-ready patterns extracted from real projects.
 ### What this means:
 
 - ❌ Don't write error types that won't be used
+- ❌ Don't create custom error type for every error case
 - ❌ Don't add methods "for completeness"
 - ❌ Don't create helper functions that have one caller
 - ❌ Don't add validation for impossible scenarios
@@ -34,6 +35,8 @@ Production-ready patterns extracted from real projects.
 - ❌ Don't add logging/metrics that nobody reads
 
 - ✅ Write only what the feature requires
+- ✅ Use few sentinel categories (ErrNotFound, ErrConflict) + wrap with context
+- ✅ Typed errors only when caller needs to extract data (RetryAfter, Field)
 - ✅ Add code when there's actual need
 - ✅ Delete unused code immediately
 - ✅ Prefer inline code over tiny functions
@@ -58,7 +61,7 @@ Production-ready patterns extracted from real projects.
 | **Database** | `pgx/v5` + `squirrel` |
 | **Transactions** | Context injection + retry |
 | **DI** | Service Registry |
-| **Errors** | Simple typed errors with HTTP mapping |
+| **Errors** | Sentinel categories + wrap (errs package) |
 | **Logging** | slog (small) / zap (large) — ask user |
 | **Tracing** | OpenTelemetry (optional) — ask user |
 | **Migrations** | `goose/v3` |
@@ -75,8 +78,9 @@ project/
 ├── internal/
 │   ├── config/
 │   │   └── config.go         # Config with envPrefix
+│   ├── errs/
+│   │   └── errors.go         # Sentinel errors + helpers
 │   ├── common/
-│   │   ├── errors.go         # Error types
 │   │   └── optional.go       # Optional[T] helper
 │   ├── models/
 │   │   └── {entity}.go       # Domain models + mappers
@@ -267,6 +271,7 @@ go get github.com/exaring/otelpgx@latest
 
 ## Version
 
+- 1.14.0 — Error handling: sentinel categories + wrap (internal/errs), helpers, no re-wrap
 - 1.13.1 — golangci-lint v2 fix: typecheck is built-in, wsl (not wsl_v5), troubleshooting
 - 1.13.0 — golangci-lint v2 migration (formatters, nolintlint anti-cheat, err113)
 - 1.12.0 — Comprehensive linting configuration (revive, depguard, exclusion patterns)

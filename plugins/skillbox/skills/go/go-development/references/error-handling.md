@@ -1,300 +1,271 @@
 # Error Handling Pattern
 
-Simple typed errors with HTTP status mapping.
+Simple sentinel errors with wrapping.
 
-## Core Principle
+## Core Rule
 
-**Simple is better.** Use a single `Error` struct with string-based error codes.
-
-- ❌ No chainable errors with `CausedBy()`
-- ❌ No stack trace capture
-- ❌ No complex error chains
-- ✅ Simple struct with Code, Message, Err
-- ✅ Standard `fmt.Errorf("%w")` for wrapping
-- ✅ Direct HTTP status mapping
-
-## Error Structure
+Use **few sentinel categories** (4-8) and wrap errors with context:
 
 ```go
-package errors
-
-import (
-    "errors"
-    "net/http"
+// ❌ BAD: Many specific errors
+var (
+    ErrUserNotFound  = errors.New("user not found")
+    ErrOrderNotFound = errors.New("order not found")
+    // ... 50+ more
 )
 
-// ErrorCode classifies errors for HTTP mapping.
-type ErrorCode string
-
-const (
-    CodeOK           ErrorCode = "ok"
-    CodeInvalid      ErrorCode = "invalid"
-    CodeNotFound     ErrorCode = "not_found"
-    CodeConflict     ErrorCode = "conflict"
-    CodeUnauthorized ErrorCode = "unauthorized"
-    CodeForbidden    ErrorCode = "forbidden"
-    CodeInternal     ErrorCode = "internal"
-    CodeUnavailable  ErrorCode = "unavailable"
+// ✅ GOOD: Few categories + wrap
+var (
+    ErrNotFound     = errors.New("not found")
+    ErrConflict     = errors.New("conflict")
+    ErrValidation   = errors.New("validation")
+    ErrForbidden    = errors.New("forbidden")
+    ErrUnauthorized = errors.New("unauthorized")
 )
+```
 
-// Error is the application error type.
-type Error struct {
-    Code    ErrorCode
-    Message string
-    Err     error // wrapped error (optional)
-}
+## Wrap Format
 
-func (e *Error) Error() string {
-    if e.Err != nil {
-        return e.Message + ": " + e.Err.Error()
+Pattern: `"<op>: <context>: %w"`, always `%w` at the end:
+
+```go
+fmt.Errorf("UserService.Get userID=%s: %w", id, err)
+fmt.Errorf("OrderRepo.FindByID orderID=%s: %w", id, ErrNotFound)
+```
+
+## Don't Re-Wrap Sentinels
+
+Repository creates sentinel, service wraps original err:
+
+```go
+// ❌ BAD: Re-creates sentinel, loses context
+user, err := s.repo.FindByID(ctx, id)
+if err != nil {
+    if errors.Is(err, ErrNotFound) {
+        return nil, fmt.Errorf("user %s: %w", id, ErrNotFound)  // WRONG
     }
-    return e.Message
 }
 
-func (e *Error) Unwrap() error {
-    return e.Err
+// ✅ GOOD: Wrap original err
+user, err := s.repo.FindByID(ctx, id)
+if err != nil {
+    return nil, fmt.Errorf("UserService.Get userID=%s: %w", id, err)
 }
 ```
 
-## HTTP Status Mapping
+Repository guarantees the sentinel, service just adds context.
+
+## Category Set (4-8)
+
+| Category | HTTP | When |
+|----------|------|------|
+| `ErrNotFound` | 404 | Resource doesn't exist |
+| `ErrConflict` | 409 | Duplicate, version conflict |
+| `ErrValidation` | 400 | Invalid input |
+| `ErrForbidden` | 403 | No permission |
+| `ErrUnauthorized` | 401 | Not authenticated |
+| `ErrTimeout` | 504 | External dependency timeout |
+| `ErrUnavailable` | 503 | Service unavailable |
+
+Don't bloat — add only what you actually map.
+
+## Package: `internal/errs`
 
 ```go
-// HTTPStatusCode maps error code to HTTP status.
-func HTTPStatusCode(err error) int {
-    var e *Error
-    if !errors.As(err, &e) {
-        return http.StatusInternalServerError
+package errs
+
+import (
+    "errors"
+    "fmt"
+    "net/http"
+)
+
+// Sentinel categories
+var (
+    ErrNotFound     = errors.New("not found")
+    ErrConflict     = errors.New("conflict")
+    ErrValidation   = errors.New("validation")
+    ErrForbidden    = errors.New("forbidden")
+    ErrUnauthorized = errors.New("unauthorized")
+    ErrTimeout      = errors.New("timeout")
+    ErrUnavailable  = errors.New("unavailable")
+)
+
+// Wrap adds operation context
+func Wrap(op string, err error) error {
+    if err == nil {
+        return nil
     }
-    switch e.Code {
-    case CodeOK:
-        return http.StatusOK
-    case CodeInvalid:
-        return http.StatusBadRequest
-    case CodeNotFound:
+    return fmt.Errorf("%s: %w", op, err)
+}
+
+// NotFoundf creates not found error with context
+func NotFoundf(op, format string, args ...any) error {
+    return fmt.Errorf("%s: %w: %s", op, ErrNotFound, fmt.Sprintf(format, args...))
+}
+
+// Conflictf creates conflict error
+func Conflictf(op, format string, args ...any) error {
+    return fmt.Errorf("%s: %w: %s", op, ErrConflict, fmt.Sprintf(format, args...))
+}
+
+// Validationf creates validation error
+func Validationf(op, format string, args ...any) error {
+    return fmt.Errorf("%s: %w: %s", op, ErrValidation, fmt.Sprintf(format, args...))
+}
+
+// HTTPStatus maps error to HTTP status
+func HTTPStatus(err error) int {
+    switch {
+    case errors.Is(err, ErrNotFound):
         return http.StatusNotFound
-    case CodeConflict:
+    case errors.Is(err, ErrConflict):
         return http.StatusConflict
-    case CodeUnauthorized:
-        return http.StatusUnauthorized
-    case CodeForbidden:
+    case errors.Is(err, ErrValidation):
+        return http.StatusBadRequest
+    case errors.Is(err, ErrForbidden):
         return http.StatusForbidden
-    case CodeUnavailable:
+    case errors.Is(err, ErrUnauthorized):
+        return http.StatusUnauthorized
+    case errors.Is(err, ErrTimeout):
+        return http.StatusGatewayTimeout
+    case errors.Is(err, ErrUnavailable):
         return http.StatusServiceUnavailable
     default:
         return http.StatusInternalServerError
     }
 }
 
-// ErrorCode extracts error code from error.
-func GetErrorCode(err error) ErrorCode {
-    var e *Error
-    if errors.As(err, &e) {
-        return e.Code
-    }
-    return CodeInternal
-}
-```
-
-## Client-Safe Messages
-
-Internal errors should not expose details to clients:
-
-```go
-// ErrorMessage returns client-safe message.
-// Internal errors return generic message for security.
-func ErrorMessage(err error) string {
-    var e *Error
-    if !errors.As(err, &e) || e.Code == CodeInternal {
-        return "an internal error has occurred"
-    }
-    return e.Message
-}
-```
-
-## Creating Errors
-
-### Pre-defined Package Errors
-
-```go
-// Package-level errors for common cases
-var (
-    ErrUserNotFound  = &Error{Code: CodeNotFound, Message: "user not found"}
-    ErrEmailTaken    = &Error{Code: CodeConflict, Message: "email already registered"}
-    ErrUnauthorized  = &Error{Code: CodeUnauthorized, Message: "unauthorized"}
-    ErrForbidden     = &Error{Code: CodeForbidden, Message: "forbidden"}
-)
-```
-
-### Inline Creation
-
-```go
-// Validation errors with specific messages
-return &Error{Code: CodeInvalid, Message: "email format is invalid"}
-
-// Not found with context
-return &Error{Code: CodeNotFound, Message: fmt.Sprintf("user %s not found", id)}
-```
-
-### Wrapping with Context
-
-```go
-// Wrap database error
-user, err := s.repo.FindByID(ctx, id)
-if err != nil {
-    return nil, &Error{
-        Code:    CodeInternal,
-        Message: "failed to find user",
-        Err:     err,
+// Message returns client-safe message
+func Message(err error) string {
+    switch {
+    case errors.Is(err, ErrNotFound):
+        return "resource not found"
+    case errors.Is(err, ErrConflict):
+        return "resource conflict"
+    case errors.Is(err, ErrValidation):
+        return "validation failed"
+    case errors.Is(err, ErrForbidden):
+        return "forbidden"
+    case errors.Is(err, ErrUnauthorized):
+        return "unauthorized"
+    case errors.Is(err, ErrTimeout):
+        return "request timeout"
+    case errors.Is(err, ErrUnavailable):
+        return "service unavailable"
+    default:
+        return "internal error"
     }
 }
-
-// Or use standard wrapping (simpler)
-if err != nil {
-    return nil, fmt.Errorf("find user: %w", err)
-}
 ```
 
-## Usage in Repository
+## Usage: Repository
 
 ```go
-func (r *userRepo) FindByID(ctx context.Context, id string) (*User, error) {
+func (r *UserRepo) FindByID(ctx context.Context, id string) (*User, error) {
     row := r.db.QueryRow(ctx, query, id)
-
     var user User
-    if err := row.Scan(&user.ID, &user.Name, &user.Email); err != nil {
+    if err := row.Scan(&user.ID, &user.Name); err != nil {
         if errors.Is(err, pgx.ErrNoRows) {
-            return nil, ErrUserNotFound
+            return nil, errs.NotFoundf("UserRepo.FindByID", "userID=%s", id)
         }
-        return nil, &Error{Code: CodeInternal, Message: "failed to query user", Err: err}
+        return nil, errs.Wrap("UserRepo.FindByID", err)
     }
     return &user, nil
 }
 
-func (r *userRepo) Create(ctx context.Context, user *User) error {
-    _, err := r.db.Exec(ctx, insertQuery, user.ID, user.Name, user.Email)
+func (r *UserRepo) Create(ctx context.Context, user *User) error {
+    _, err := r.db.Exec(ctx, query, user.ID, user.Email)
     if err != nil {
-        // Check for unique constraint violation
         var pgErr *pgconn.PgError
         if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-            return ErrEmailTaken
+            return errs.Conflictf("UserRepo.Create", "email=%s", user.Email)
         }
-        return &Error{Code: CodeInternal, Message: "failed to create user", Err: err}
+        return errs.Wrap("UserRepo.Create", err)
     }
     return nil
 }
 ```
 
-## Usage in Service
+## Usage: Service
 
 ```go
+func (s *UserService) Get(ctx context.Context, id string) (*User, error) {
+    user, err := s.repo.FindByID(ctx, id)
+    if err != nil {
+        return nil, errs.Wrap("UserService.Get", err)  // Just wrap, don't re-classify
+    }
+    return user, nil
+}
+
 func (s *UserService) Create(ctx context.Context, req CreateUserRequest) (*User, error) {
-    // Validation
     if req.Email == "" {
-        return nil, &Error{Code: CodeInvalid, Message: "email is required"}
+        return nil, errs.Validationf("UserService.Create", "email is required")
     }
 
-    // Check existing
-    existing, err := s.repo.FindByEmail(ctx, req.Email)
-    if err != nil && GetErrorCode(err) != CodeNotFound {
-        return nil, err
-    }
-    if existing != nil {
-        return nil, ErrEmailTaken
-    }
-
-    // Create
-    user := &User{
-        ID:    uuid.New(),
-        Name:  req.Name,
-        Email: req.Email,
-    }
-
+    user := &User{ID: uuid.NewString(), Email: req.Email}
     if err := s.repo.Create(ctx, user); err != nil {
-        return nil, err
+        return nil, errs.Wrap("UserService.Create", err)
     }
-
     return user, nil
 }
 ```
 
-## Usage in HTTP Handler
+## Usage: HTTP Handler
 
 ```go
-func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
-    var req CreateUserRequest
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        h.writeError(w, r, &Error{Code: CodeInvalid, Message: "invalid request body"})
-        return
-    }
-
-    user, err := h.services.Users().Create(r.Context(), req)
-    if err != nil {
-        h.writeError(w, r, err)
-        return
-    }
-
-    h.writeJSON(w, http.StatusCreated, user)
-}
-
 func (h *Handler) writeError(w http.ResponseWriter, r *http.Request, err error) {
-    status := HTTPStatusCode(err)
-    message := ErrorMessage(err)
+    status := errs.HTTPStatus(err)
+    message := errs.Message(err)
 
-    // Log internal errors
     if status == http.StatusInternalServerError {
-        h.logger.Error("internal error",
-            slog.String("error", err.Error()),
-            slog.String("path", r.URL.Path),
-        )
+        h.logger.Error("internal error", slog.String("error", err.Error()))
     }
 
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(status)
-    json.NewEncoder(w).Encode(map[string]string{
-        "error": message,
-    })
+    json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
 ```
 
-## Type Checking
+## Exceptions: Typed Errors
+
+Use typed error **only** when caller needs to extract data:
 
 ```go
-// Using errors.Is for pre-defined errors
-if errors.Is(err, ErrUserNotFound) {
-    // Handle not found
+// Rate limit with retry info
+type RateLimitError struct {
+    RetryAfter time.Duration
 }
 
-// Using errors.As for any Error
-var e *Error
-if errors.As(err, &e) {
-    switch e.Code {
-    case CodeNotFound:
-        // Handle not found
-    case CodeInvalid:
-        // Handle validation
-    }
+func (e RateLimitError) Error() string { return "rate limited" }
+func (e RateLimitError) Unwrap() error { return errs.ErrUnavailable }
+
+// Field-level validation
+type FieldError struct {
+    Field string
+    Msg   string
 }
 
-// Using helper function
-if GetErrorCode(err) == CodeNotFound {
-    // Handle not found
+func (e FieldError) Error() string { return e.Field + ": " + e.Msg }
+func (e FieldError) Unwrap() error { return errs.ErrValidation }
+
+// DB constraint violation
+type ConstraintError struct {
+    Constraint string
 }
+
+func (e ConstraintError) Error() string { return "constraint: " + e.Constraint }
+func (e ConstraintError) Unwrap() error { return errs.ErrConflict }
 ```
 
-## Best Practices
+## Link to Linting
 
-### DO:
-- ✅ Use pre-defined errors for common cases
-- ✅ Return client-safe messages for internal errors
-- ✅ Log full error details server-side
-- ✅ Use `errors.Is/As` for type checking
-- ✅ Keep error messages user-friendly
+- `err113` requires `%w` in `fmt.Errorf` — our helpers comply
+- Raw `fmt.Errorf("message")` without `%w` will fail lint
+- If you must bypass, use `//nolint:err113 // reason` with explanation
 
-### DON'T:
-- ❌ Expose internal error details to clients
-- ❌ Create errors without proper codes
-- ❌ Use generic "error occurred" messages
-- ❌ Forget to log internal errors
+See [linting-pattern.md](linting-pattern.md) for nolintlint rules.
 
 ## Related
 
