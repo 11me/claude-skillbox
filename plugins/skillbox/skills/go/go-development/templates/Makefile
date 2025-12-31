@@ -18,9 +18,9 @@ GOMOD := $(GOCMD) mod
 BIN_DIR := bin
 CMD_DIR := cmd/app
 
-.PHONY: all build run test lint deadcode clean docker docker-push migrate help
+.PHONY: all build run test fmt lint lint-fix deadcode clean docker docker-push migrate help
 
-all: lint test build ## Run lint, test, and build
+all: fmt lint test build ## Run fmt, lint, test, and build
 
 build: ## Build the application
 	@echo "Building $(APP_NAME) $(VERSION)..."
@@ -39,18 +39,20 @@ test-short: ## Run short tests only
 test-integration: ## Run integration tests
 	$(GOTEST) -tags=integration -race ./...
 
-lint: ## Run linter
-	@which golangci-lint > /dev/null || (echo "Installing golangci-lint..." && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
+fmt: ## Format code (golangci-lint v2)
+	@which golangci-lint > /dev/null || (echo "Install: curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b \$$(go env GOPATH)/bin v2.7.1" && exit 1)
+	golangci-lint fmt
+
+lint: ## Run linter (golangci-lint v2)
+	@which golangci-lint > /dev/null || (echo "Install: curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b \$$(go env GOPATH)/bin v2.7.1" && exit 1)
 	golangci-lint run ./...
+
+lint-fix: ## Run linter with auto-fix
+	golangci-lint run --fix ./...
 
 deadcode: ## Check for unreachable functions
 	@which deadcode > /dev/null 2>&1 || go install golang.org/x/tools/cmd/deadcode@latest
 	deadcode -test ./...
-
-fmt: ## Format code
-	$(GOCMD) fmt ./...
-	@which goimports > /dev/null || go install golang.org/x/tools/cmd/goimports@latest
-	goimports -w .
 
 tidy: ## Tidy and verify dependencies
 	$(GOMOD) tidy
@@ -95,10 +97,9 @@ deps: ## Download dependencies
 	$(GOMOD) download
 
 tools: ## Install development tools
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin v2.7.1
 	go install github.com/pressly/goose/v3/cmd/goose@latest
 	go install github.com/air-verse/air@latest
-	go install golang.org/x/tools/cmd/goimports@latest
 	go install golang.org/x/tools/cmd/deadcode@latest
 
 help: ## Show this help

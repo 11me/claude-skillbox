@@ -161,7 +161,15 @@ project/
 | Topic | File |
 |-------|------|
 | Naming Conventions | [naming-conventions.md](references/naming-conventions.md) |
+| Control Structures | [control-structures.md](references/control-structures.md) |
+| Interface Design | [interface-design.md](references/interface-design.md) |
+| Allocation (new/make) | [allocation-patterns.md](references/allocation-patterns.md) |
+| Defer | [defer-patterns.md](references/defer-patterns.md) |
+| Embedding | [embedding-patterns.md](references/embedding-patterns.md) |
+| Blank Identifier | [blank-identifier.md](references/blank-identifier.md) |
 | Concurrency | [concurrency-pattern.md](references/concurrency-pattern.md) |
+| Channel Axioms | [channel-axioms.md](references/channel-axioms.md) |
+| Linting | [linting-pattern.md](references/linting-pattern.md) |
 | Common Pitfalls | [common-pitfalls.md](references/common-pitfalls.md) |
 | Performance | [performance-tips.md](references/performance-tips.md) |
 | Code Quality | [code-quality.md](references/code-quality.md) |
@@ -259,6 +267,10 @@ go get github.com/exaring/otelpgx@latest
 
 ## Version
 
+- 1.13.0 — golangci-lint v2 migration (formatters, nolintlint anti-cheat, err113, wsl_v5)
+- 1.12.0 — Comprehensive linting configuration (revive, depguard, exclusion patterns)
+- 1.11.1 — Channel axioms (nil/closed behavior, WaitMany, broadcast signaling)
+- 1.11.0 — Effective Go patterns (control structures, interfaces, allocation, defer, embedding, blank identifier)
 - 1.10.3 — Package structure decision guide (pkg/ vs internal/)
 - 1.10.2 — Config: embedded structs only (no named fields in main Config)
 - 1.10.1 — Fix: UserColumns() in models package only (not repository)
