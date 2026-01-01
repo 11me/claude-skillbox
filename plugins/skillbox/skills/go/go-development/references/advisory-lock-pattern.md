@@ -11,6 +11,56 @@ ERROR: could not serialize access due to concurrent update
 SQLSTATE: 40001
 ```
 
+## Why SERIALIZABLE Alone Isn't Enough
+
+### The Mixed Isolation Problem
+
+PostgreSQL's SERIALIZABLE isolation (SSI) works by building a **dependency graph** between transactions and detecting "dangerous structures" — cycles of rw-conflicts (read-write conflicts).
+
+**Critical limitation:** SSI only tracks transactions that participate in the protocol.
+
+#### How SSI Detects Conflicts
+
+1. **SERIALIZABLE transactions** leave **predicate locks (SIREAD locks)** when reading
+2. These locks are "markers" in memory: *"Transaction T1 read rows matching condition X"*
+3. When another transaction modifies those rows, PostgreSQL detects the conflict
+
+#### Why READ COMMITTED Breaks SSI
+
+**READ COMMITTED transactions don't leave SIREAD locks.** They're invisible to SSI for reads.
+
+**Write Skew Example:**
+- Constraint: `balance(A) + balance(B) > 0`
+- T1 (SERIALIZABLE): Reads A, B → decreases A. Leaves SIREAD lock.
+- T2 (READ COMMITTED): Reads A, B → decreases B. **No SIREAD lock.**
+
+**What PostgreSQL sees:**
+- T1→T2: T1 read B, T2 modified B → Conflict detected ✓
+- T2→T1: T2 read A, T1 modified A → **No detection** ✗ (T2 left no marker)
+
+**Result:** Both commit, constraint violated, data corrupted.
+
+### The Real-World Problem
+
+Most production systems have:
+- Legacy code using READ COMMITTED (default in PostgreSQL)
+- New code using SERIALIZABLE for critical operations
+- Background jobs, migrations, admin scripts — often READ COMMITTED
+
+**Egor Rogov's verdict:** *"If you want SERIALIZABLE guarantees, ALL transactions touching logically related data must be SERIALIZABLE."*
+
+### Advisory Locks as Universal Protection
+
+Advisory locks work at a **lower level** than SSI — they're true exclusive locks that block all transactions regardless of isolation level.
+
+| Protection | SERIALIZABLE only | Advisory Lock + SERIALIZABLE |
+|------------|-------------------|------------------------------|
+| Against other SERIALIZABLE | ✓ | ✓ |
+| Against READ COMMITTED writes | ✗ | ✓ |
+| Against legacy code | ✗ | ✓ |
+
+**This is why we use advisory locks:** They provide protection even in mixed-isolation environments.
+
 ## Solution
 
 Use `pg_advisory_xact_lock(hashtext(label))` — a transaction-scoped advisory lock:
@@ -136,6 +186,7 @@ SELECT pg_advisory_xact_lock(hashtext('TransferFunds:user123'));
 | Wallet balance updates | Yes |
 | Counter increments (sequences) | Yes |
 | Auction bidding | Yes |
+| Mixed isolation level environment | Yes — essential |
 | Simple CRUD without concurrency | No |
 | Read-only queries | No |
 | Transactions with natural row-level locks | Maybe |
