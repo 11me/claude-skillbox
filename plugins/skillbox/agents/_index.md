@@ -32,6 +32,7 @@ Autonomous agents for specialized tasks. Each agent has its own model, tools, an
 |-------|-------|-------------|----------|
 | [test-generator](go/test-generator.md) | sonnet | Generate Go table-driven tests | "write Go tests" |
 | [project-init](go/project-init.md) | sonnet | Scaffold Go project | "create Go project" |
+| [code-reviewer](go/code-reviewer.md) | sonnet | Review Go code against standards | "review Go code", `/go-review` |
 
 ### Python
 
@@ -60,6 +61,7 @@ Autonomous agents for specialized tasks. Each agent has its own model, tools, an
 | Scaffold TypeScript project | ts/project-init |
 | Generate Go tests | go/test-generator |
 | Scaffold Go project | go/project-init |
+| Review Go code | go/code-reviewer |
 | Generate Python tests | python/test-writer |
 | Generate Rust tests | rust/test-generator |
 
@@ -76,7 +78,7 @@ Autonomous agents for specialized tasks. Each agent has its own model, tools, an
 | Language | Agents |
 |----------|--------|
 | TypeScript | ts/test-generator, ts/project-init |
-| Go | go/test-generator, go/project-init |
+| Go | go/test-generator, go/project-init, go/code-reviewer |
 | Python | python/test-writer |
 | Rust | rust/test-generator |
 | Multi-language | tdd-coach, test-analyzer |
