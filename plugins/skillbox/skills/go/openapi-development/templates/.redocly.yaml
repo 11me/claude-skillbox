@@ -1,0 +1,44 @@
+# Redocly CLI configuration
+# Docs: https://redocly.com/docs/cli/configuration/
+
+extends:
+  - recommended
+
+rules:
+  # Structural rules
+  no-unused-components: error
+  no-empty-servers: warn
+
+  # Operation rules
+  operation-operationId: error
+  operation-summary: error
+  operation-description: warn
+  operation-operationId-unique: error
+  operation-operationId-url-safe: error
+
+  # Tag rules
+  tag-description: warn
+  operation-tag-defined: error
+
+  # Naming conventions
+  paths-kebab-case: error
+
+  # Security
+  security-defined: warn
+
+  # Documentation
+  info-contact: warn
+  info-license: off
+
+theme:
+  openapi:
+    schemaExpansionLevel: 2
+    generateCodeSamples:
+      languages:
+        - lang: curl
+        - lang: Go
+        - lang: Python
+
+# Decorators for transformations (optional)
+# decorators:
+#   remove-x-internal: on

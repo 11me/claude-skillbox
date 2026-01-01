@@ -1,0 +1,53 @@
+# OpenAPI targets - include in main Makefile
+#
+# Usage:
+#   Add to your Makefile:
+#   include Makefile.openapi
+#
+# Or copy these targets into your existing Makefile.
+
+API_VERSION ?= v1
+API_SPEC := api/$(API_VERSION)/openapi.yaml
+API_BUNDLE := api/$(API_VERSION)/bundle.yaml
+API_OUTPUT := internal/http/$(API_VERSION)/api.gen.go
+OAPI_CONFIG := oapi-codegen.yaml
+
+.PHONY: openapi-lint openapi-bundle openapi-generate openapi-preview openapi-all tools-openapi
+
+## OpenAPI targets
+
+openapi-lint: ## Lint OpenAPI specification
+	@which redocly > /dev/null 2>&1 || (echo "Installing redocly..." && npm install -g @redocly/cli@latest)
+	redocly lint $(API_SPEC)
+
+openapi-bundle: openapi-lint ## Bundle OpenAPI spec (resolve $refs)
+	redocly bundle $(API_SPEC) -o $(API_BUNDLE)
+	@echo "Bundled: $(API_BUNDLE)"
+
+openapi-generate: openapi-bundle ## Generate Go code from OpenAPI
+	@which oapi-codegen > /dev/null 2>&1 || (echo "Installing oapi-codegen..." && go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest)
+	oapi-codegen --config $(OAPI_CONFIG) $(API_BUNDLE)
+	@echo "Generated: $(API_OUTPUT)"
+
+openapi-preview: ## Preview API documentation locally
+	@which redocly > /dev/null 2>&1 || npm install -g @redocly/cli@latest
+	redocly preview-docs $(API_SPEC)
+
+openapi-all: openapi-generate ## Lint, bundle, and generate (alias)
+	@echo "OpenAPI generation complete"
+
+tools-openapi: ## Install OpenAPI tools
+	npm install -g @redocly/cli@latest
+	go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+	@echo "Installed: redocly, oapi-codegen"
+
+## Help
+
+help-openapi: ## Show OpenAPI targets
+	@echo "OpenAPI targets:"
+	@echo "  openapi-lint      - Lint OpenAPI specification"
+	@echo "  openapi-bundle    - Bundle spec (resolve \$$refs)"
+	@echo "  openapi-generate  - Generate Go code from spec"
+	@echo "  openapi-preview   - Preview API docs in browser"
+	@echo "  openapi-all       - Run all steps (lint + bundle + generate)"
+	@echo "  tools-openapi     - Install required tools"

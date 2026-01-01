@@ -1,0 +1,111 @@
+# User schemas
+# File: api/v1/components/schemas/user.yaml
+
+User:
+  type: object
+  description: User account
+  required:
+    - id
+    - name
+    - email
+    - createdAt
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: Unique user identifier
+      x-go-type-name: UserID
+    name:
+      type: string
+      minLength: 2
+      maxLength: 100
+      description: User display name
+      x-oapi-codegen-extra-tags:
+        validate: "required,min=2,max=100"
+    email:
+      type: string
+      format: email
+      description: User email address
+      x-oapi-codegen-extra-tags:
+        validate: "required,email"
+    createdAt:
+      type: string
+      format: date-time
+      description: Account creation timestamp
+    updatedAt:
+      type: string
+      format: date-time
+      description: Last update timestamp
+
+CreateUserRequest:
+  type: object
+  description: Request body for creating a user
+  required:
+    - name
+    - email
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 100
+      description: User display name
+    email:
+      type: string
+      format: email
+      description: User email address
+
+UpdateUserRequest:
+  type: object
+  description: Request body for updating a user
+  properties:
+    name:
+      type: string
+      minLength: 2
+      maxLength: 100
+      description: User display name
+    email:
+      type: string
+      format: email
+      description: User email address
+
+UserList:
+  type: object
+  description: Paginated list of users
+  required:
+    - items
+    - totalCount
+  properties:
+    items:
+      type: array
+      items:
+        $ref: "#/User"
+      description: List of users
+    totalCount:
+      type: integer
+      format: int64
+      description: Total number of users
+    limit:
+      type: integer
+      description: Maximum items per page
+    offset:
+      type: integer
+      description: Number of items skipped
+
+# Error schema (reusable)
+Error:
+  type: object
+  description: Error response
+  required:
+    - code
+    - message
+  properties:
+    code:
+      type: string
+      description: Error code
+    message:
+      type: string
+      description: Human-readable error message
+    details:
+      type: object
+      additionalProperties: true
+      description: Additional error details

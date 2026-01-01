@@ -1,0 +1,127 @@
+# User resource paths
+# File: api/v1/paths/users.yaml
+
+/users:
+  get:
+    operationId: listUsers
+    summary: List users
+    description: Returns a paginated list of users
+    tags:
+      - Users
+    parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+          maximum: 100
+        description: Maximum number of users to return
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          default: 0
+        description: Number of users to skip
+    responses:
+      "200":
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/_index.yaml#/UserList"
+      "500":
+        $ref: "../components/responses/_index.yaml#/InternalError"
+
+  post:
+    operationId: createUser
+    summary: Create a user
+    description: Creates a new user account
+    tags:
+      - Users
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/_index.yaml#/CreateUserRequest"
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/_index.yaml#/User"
+      "400":
+        $ref: "../components/responses/_index.yaml#/BadRequest"
+      "409":
+        $ref: "../components/responses/_index.yaml#/Conflict"
+      "500":
+        $ref: "../components/responses/_index.yaml#/InternalError"
+
+/users/{userID}:
+  parameters:
+    - name: userID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: User identifier
+
+  get:
+    operationId: getUser
+    summary: Get user by ID
+    description: Returns a single user by their ID
+    tags:
+      - Users
+    responses:
+      "200":
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/_index.yaml#/User"
+      "404":
+        $ref: "../components/responses/_index.yaml#/NotFound"
+      "500":
+        $ref: "../components/responses/_index.yaml#/InternalError"
+
+  put:
+    operationId: updateUser
+    summary: Update user
+    description: Updates an existing user
+    tags:
+      - Users
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/_index.yaml#/UpdateUserRequest"
+    responses:
+      "200":
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/_index.yaml#/User"
+      "400":
+        $ref: "../components/responses/_index.yaml#/BadRequest"
+      "404":
+        $ref: "../components/responses/_index.yaml#/NotFound"
+      "500":
+        $ref: "../components/responses/_index.yaml#/InternalError"
+
+  delete:
+    operationId: deleteUser
+    summary: Delete user
+    description: Deletes a user by their ID
+    tags:
+      - Users
+    responses:
+      "204":
+        description: No Content
+      "404":
+        $ref: "../components/responses/_index.yaml#/NotFound"
+      "500":
+        $ref: "../components/responses/_index.yaml#/InternalError"

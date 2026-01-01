@@ -1,0 +1,47 @@
+# oapi-codegen configuration
+# Docs: https://github.com/oapi-codegen/oapi-codegen
+#
+# Usage:
+#   oapi-codegen --config oapi-codegen.yaml api/v1/bundle.yaml
+
+package: api
+generate:
+  chi-server: true      # Chi router (recommended for Go)
+  models: true          # Request/Response types
+  embedded-spec: false  # Don't embed spec in binary
+
+output: internal/http/v1/api.gen.go
+
+output-options:
+  skip-prune: false     # Remove unused types
+
+# Custom initialisms (e.g., ID, API, URL)
+# additional-initialisms:
+#   - UUID
+#   - SSO
+
+# Import mapping for multi-file specs
+# import-mapping:
+#   ./components/schemas/common.yaml: github.com/yourorg/common
+
+# Alternative configurations:
+#
+# Echo server:
+#   generate:
+#     echo-server: true
+#     models: true
+#
+# Client only:
+#   generate:
+#     client: true
+#     models: true
+#
+# Types only:
+#   generate:
+#     models: true
+#
+# All (server + client + types):
+#   generate:
+#     chi-server: true
+#     client: true
+#     models: true

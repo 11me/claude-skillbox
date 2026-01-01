@@ -1,0 +1,32 @@
+openapi: "3.0.3"
+info:
+  title: "{{PROJECT_NAME}} API"
+  version: "1.0.0"
+  description: |
+    API documentation for {{PROJECT_NAME}}.
+  contact:
+    name: "{{TEAM_NAME}}"
+    email: "{{TEAM_EMAIL}}"
+
+servers:
+  - url: http://localhost:8080/api/{{VERSION}}
+    description: Local development
+  - url: https://{{PROJECT_NAME}}.example.com/api/{{VERSION}}
+    description: Production
+
+paths:
+  $ref: "paths/_index.yaml"
+
+components:
+  schemas:
+    $ref: "components/schemas/_index.yaml"
+  parameters:
+    $ref: "components/parameters/_index.yaml"
+  responses:
+    $ref: "components/responses/_index.yaml"
+  requestBodies:
+    $ref: "components/requests/_index.yaml"
+
+tags:
+  - name: Health
+    description: Health check endpoints
