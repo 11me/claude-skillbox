@@ -7,7 +7,7 @@ description: |
   - `/go` command invoked
   - Creating/scaffolding Go services
 
-  Covers: Entry Point, Config, Database, Services, Repositories, Errors, Logging, Testing, Money,
+  Covers: Entry Point, Config, Database, Cache, Services, Repositories, Errors, Logging, Testing, Money,
   HTTP Handlers, Middleware, Validation, Pagination, Health Checks, Workers, Tracing,
   Naming, Concurrency, Pitfalls, Performance.
 triggers:
