@@ -188,3 +188,78 @@ func (s *storage) ExecReadCommitted(ctx context.Context, fn TxFunc) error {
     return s.db.ExecReadCommitted(ctx, fn)
 }
 ```
+
+## Filter Pattern
+
+For queries with dynamic filtering, use the Filter pattern.
+
+### Filter Struct (in models)
+
+```go
+// internal/models/user.go
+type UserFilter struct {
+    ID        []string    // Slices for multi-value (IN clause)
+    Email     []string
+    IsActive  *bool       // Pointers for optional
+    Role      []string
+    CreatedAt *DateFilter // Nested for ranges
+}
+```
+
+### Common Filter Types (in models/common.go)
+
+```go
+type DateFilter struct {
+    From *time.Time
+    To   *time.Time
+}
+```
+
+### getCondition Method (in repository)
+
+```go
+// internal/storage/user.go
+func (r *userRepository) getUserCondition(filter *UserFilter) []sq.Sqlizer {
+    conditions := make([]sq.Sqlizer, 0)
+
+    if filter == nil {
+        return conditions
+    }
+
+    if len(filter.ID) > 0 {
+        conditions = append(conditions, sq.Eq{"u.id": filter.ID})
+    }
+
+    if filter.IsActive != nil {
+        conditions = append(conditions, sq.Eq{"u.is_active": *filter.IsActive})
+    }
+
+    if filter.CreatedAt != nil {
+        if filter.CreatedAt.From != nil {
+            conditions = append(conditions, sq.GtOrEq{"u.created_at": filter.CreatedAt.From})
+        }
+        if filter.CreatedAt.To != nil {
+            conditions = append(conditions, sq.LtOrEq{"u.created_at": filter.CreatedAt.To})
+        }
+    }
+
+    return conditions
+}
+```
+
+### Usage
+
+```go
+func (r *userRepository) FindByFilter(ctx context.Context, filter *UserFilter) ([]*User, error) {
+    conditions := r.getUserCondition(filter)
+
+    query := psql.Select(UserColumns()...).
+        From("users u").
+        Where(sq.And(conditions)).
+        OrderBy("u.created_at DESC")
+
+    // execute...
+}
+```
+
+See [filter-pattern.md](filter-pattern.md) for full documentation.

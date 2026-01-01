@@ -173,6 +173,7 @@ project/
 | Database & Transactions | [database-pattern.md](references/database-pattern.md) |
 | Service Layer | [service-pattern.md](references/service-pattern.md) |
 | Repository | [repository-pattern.md](references/repository-pattern.md) |
+| Filter Pattern | [filter-pattern.md](references/filter-pattern.md) |
 | Mapper | [mapper-pattern.md](references/mapper-pattern.md) |
 | JSONB Types | [jsonb-pattern.md](references/jsonb-pattern.md) |
 | Optional Helper | [optional-pattern.md](references/optional-pattern.md) |
@@ -229,6 +230,9 @@ project/
 | Main | [main.go](examples/main.go) |
 | Backend | [backend.go](examples/backend.go) |
 | Config | [config.go](examples/config.go) |
+| Filter | [filter.go](examples/filter.go) |
+| Common Models | [common_models.go](examples/common_models.go) |
+| Common Storage | [common_storage.go](examples/common_storage.go) |
 | Database Client | [pg-client.go](examples/pg-client.go) |
 | Repository | [repository.go](examples/repository.go) |
 | Service | [service.go](examples/service.go) |
@@ -322,6 +326,7 @@ go get github.com/exaring/otelpgx@latest
 
 ## Version
 
+- 1.19.0 — Filter pattern for database queries: XxxFilter, getXxxCondition(), /go-add-repository generates filter scaffold
 - 1.18.0 — Dependency version enforcement: PreToolUse hook for `go get @latest`
 - 1.17.0 — Testcontainers integration: typed closer, testmigration/ fixtures, goose with sql.Open
 - 1.16.1 — Fix golangci-lint v2 schema: imports-blocklist, remove deprecated options

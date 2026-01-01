@@ -101,6 +101,9 @@ def main() -> None:
         output_lines.append("- No `common/helpers/utils/shared/misc` packages")
         output_lines.append("")
         output_lines.append("- Dependencies: always use `@latest` (hook enforces)")
+        output_lines.append(
+            "- Repository queries: use Filter pattern (`XxxFilter` + `getXxxCondition()`)"
+        )
         output_lines.append("")
         output_lines.append("→ Run `golangci-lint run` after completing Go tasks")
         output_lines.append("")

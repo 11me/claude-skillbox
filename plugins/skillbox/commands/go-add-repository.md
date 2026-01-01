@@ -27,9 +27,12 @@ Generate a new repository with interface and register it in the Storage.
 ## Generated Files
 
 ```
+internal/models/
+└── <name>.go         # Updated with {{Name}}Filter struct
+
 internal/storage/
 ├── storage.go        # Updated with repository getter
-└── <name>.go         # New repository file
+└── <name>.go         # New repository file with get{{Name}}Condition()
 ```
 
 ## Steps
@@ -42,7 +45,26 @@ internal/storage/
    - Verify `internal/models/<name>.go` exists
    - If not, suggest running `/go-add-model` first
 
-3. **Generate repository file** (`internal/storage/<name>.go`):
+3. **Generate Filter struct** (add to `internal/models/<name>.go`):
+
+```go
+// {{Name}}Filter defines filtering criteria for {{name}} queries.
+type {{Name}}Filter struct {
+    ID        []string    // Filter by IDs
+    // TODO: Add entity-specific filter fields
+    CreatedAt *DateFilter // Filter by creation date range
+}
+```
+
+**Note:** Also ensure `DateFilter` exists in `internal/models/common.go`:
+```go
+type DateFilter struct {
+    From *time.Time
+    To   *time.Time
+}
+```
+
+4. **Generate repository file** (`internal/storage/<name>.go`):
 
 ```go
 package storage
@@ -60,10 +82,10 @@ import (
 
 type {{Name}}Repository interface {
     Create(ctx context.Context, entity *models.{{Name}}) error
-    GetByID(ctx context.Context, id uuid.UUID) (*models.{{Name}}, error)
+    GetByID(ctx context.Context, id string) (*models.{{Name}}, error)
+    FindByFilter(ctx context.Context, filter *models.{{Name}}Filter) ([]*models.{{Name}}, error)
     Update(ctx context.Context, entity *models.{{Name}}) error
-    Delete(ctx context.Context, id uuid.UUID) error
-    List(ctx context.Context, limit, offset int) ([]*models.{{Name}}, error)
+    Delete(ctx context.Context, id string) error
 }
 
 type {{name}}Repository struct {
@@ -146,12 +168,39 @@ func (r *{{name}}Repository) Delete(ctx context.Context, id uuid.UUID) error {
     return nil
 }
 
-func (r *{{name}}Repository) List(ctx context.Context, limit, offset int) ([]*models.{{Name}}, error) {
+// get{{Name}}Condition converts filter to SQL conditions.
+func (r *{{name}}Repository) get{{Name}}Condition(filter *models.{{Name}}Filter) []squirrel.Sqlizer {
+    conditions := make([]squirrel.Sqlizer, 0)
+
+    if filter == nil {
+        return conditions
+    }
+
+    if len(filter.ID) > 0 {
+        conditions = append(conditions, squirrel.Eq{"id": filter.ID})
+    }
+
+    // TODO: Add entity-specific filter conditions
+
+    if filter.CreatedAt != nil {
+        if filter.CreatedAt.From != nil {
+            conditions = append(conditions, squirrel.GtOrEq{"created_at": filter.CreatedAt.From})
+        }
+        if filter.CreatedAt.To != nil {
+            conditions = append(conditions, squirrel.LtOrEq{"created_at": filter.CreatedAt.To})
+        }
+    }
+
+    return conditions
+}
+
+func (r *{{name}}Repository) FindByFilter(ctx context.Context, filter *models.{{Name}}Filter) ([]*models.{{Name}}, error) {
+    conditions := r.get{{Name}}Condition(filter)
+
     query, args, err := squirrel.
         Select("id", "created_at", "updated_at").
         From("{{table_name}}").
-        Limit(uint64(limit)).
-        Offset(uint64(offset)).
+        Where(squirrel.And(conditions)).
         OrderBy("created_at DESC").
         PlaceholderFormat(squirrel.Dollar).
         ToSql()
@@ -177,7 +226,7 @@ func (r *{{name}}Repository) List(ctx context.Context, limit, offset int) ([]*mo
 }
 ```
 
-4. **Update Storage interface** (`internal/storage/storage.go`):
+5. **Update Storage interface** (`internal/storage/storage.go`):
 
 ```go
 type Storage interface {
@@ -191,7 +240,7 @@ func (s *storage) {{Name}}s() {{Name}}Repository {
 }
 ```
 
-5. **Report created files** and suggest next steps.
+6. **Report created files** and suggest next steps.
 
 ## Example
 
@@ -199,10 +248,13 @@ func (s *storage) {{Name}}s() {{Name}}Repository {
 /go-add-repository Product
 ```
 
-Creates `internal/storage/product.go` with:
-- `ProductRepository` interface
-- `productRepository` implementation
-- CRUD methods using squirrel
+Creates:
+- `internal/models/product.go` with `ProductFilter` struct
+- `internal/storage/product.go` with:
+  - `ProductRepository` interface
+  - `productRepository` implementation
+  - `getProductCondition()` filter method
+  - `FindByFilter()` method using filter pattern
 
 Updates `storage.go`:
 ```go
