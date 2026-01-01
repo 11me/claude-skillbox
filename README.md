@@ -3,7 +3,7 @@
 > Specialized workflow layer for Claude Code — cross-session task tracking, semantic code memory, platform engineering patterns.
 
 [![CI](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml/badge.svg)](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml)
-[![Version](https://img.shields.io/badge/version-0.46.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
+[![Version](https://img.shields.io/badge/version-0.47.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
 [![Python](https://img.shields.io/badge/python-3.12+-blue?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet?style=flat-square&logo=anthropic)](https://docs.anthropic.com/en/docs/claude-code)
@@ -43,6 +43,10 @@ claude --plugin-dir ./plugins/skillbox
 | [serena-navigation](plugins/skillbox/skills/core/serena-navigation/) | Semantic code navigation with Serena MCP |
 | [conventional-commit](plugins/skillbox/skills/core/conventional-commit/) | Structured commit messages |
 | [context-engineering](plugins/skillbox/skills/core/context-engineering/) | Long-session context management |
+| [production-flow](plugins/skillbox/skills/core/production-flow/) | Unified development workflow (INIT→PLAN→DEVELOP→VERIFY→REVIEW→SHIP) |
+| [discovery](plugins/skillbox/skills/core/discovery/) | Self-questioning system for novel insights |
+| [secrets-guardian](plugins/skillbox/skills/core/secrets-guardian/) | Multi-layered secrets protection (gitleaks, detect-secrets) |
+| [reliable-execution](plugins/skillbox/skills/core/reliable-execution/) | 4-layer persistence for context recovery |
 
 ### Go Development
 
@@ -100,6 +104,8 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | `/init-workflow` | Initialize workflow tools (beads + serena + CLAUDE.md) |
 | `/checkpoint` | Save session progress to serena memory |
 | `/commit` | Create conventional commit message |
+| `/discover` | Self-questioning discovery for novel problem-solving |
+| `/secrets-check` | Scan project for secrets and credentials |
 | `/helm-scaffold` | Scaffold GitOps structure for app |
 | `/helm-validate` | Validate Helm chart |
 | `/helm-checkpoint` | Save current Helm work state |
@@ -149,7 +155,11 @@ plugins/skillbox/
 │   │   ├── conventional-commit/
 │   │   ├── context-engineering/
 │   │   ├── tdd-enforcer/
-│   │   └── skill-patterns/
+│   │   ├── skill-patterns/
+│   │   ├── production-flow/     # Full development workflow
+│   │   ├── discovery/           # Self-questioning insights
+│   │   ├── secrets-guardian/    # Secrets protection
+│   │   └── reliable-execution/  # Context persistence
 │   ├── go/                      # Go development
 │   │   └── go-development/      # Production patterns
 │   ├── ts/                      # TypeScript (educational)
