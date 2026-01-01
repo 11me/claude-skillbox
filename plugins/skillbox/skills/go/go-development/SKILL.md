@@ -282,7 +282,15 @@ project/
 
 ## Dependencies
 
-Always use latest versions:
+**ALWAYS use `@latest`** — enforced by PreToolUse hook.
+
+| Pattern | Action |
+|---------|--------|
+| `go get pkg` (no version) | Hook suggests adding `@latest` |
+| `go get pkg@latest` | Approved |
+| `go get pkg@v1.2.3` | Hook reminds to verify via Context7 |
+
+Recommended libraries:
 
 ```bash
 # Core
@@ -314,6 +322,7 @@ go get github.com/exaring/otelpgx@latest
 
 ## Version
 
+- 1.18.0 — Dependency version enforcement: PreToolUse hook for `go get @latest`
 - 1.17.0 — Testcontainers integration: typed closer, testmigration/ fixtures, goose with sql.Open
 - 1.16.1 — Fix golangci-lint v2 schema: imports-blocklist, remove deprecated options
 - 1.16.0 — Protected .golangci.yml (hook + documentation)
