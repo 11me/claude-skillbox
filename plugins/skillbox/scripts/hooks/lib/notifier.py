@@ -66,6 +66,37 @@ def _get_beads_task() -> str | None:
     return None
 
 
+def _set_tmux_window_emoji(emoji: str) -> None:
+    """Add emoji prefix to current tmux window name."""
+    if "TMUX" not in os.environ:
+        return
+    try:
+        # Get current window name
+        result = subprocess.run(
+            ["tmux", "display-message", "-p", "#{window_name}"],
+            capture_output=True,
+            text=True,
+            timeout=1,
+        )
+        if result.returncode != 0:
+            return
+
+        current_name = result.stdout.strip()
+
+        # Remove any existing emoji prefix (🔴, ⏳, ✅)
+        clean_name = current_name.lstrip("🔴⏳✅ ")
+
+        # Set new name with emoji
+        new_name = f"{emoji} {clean_name}"
+        subprocess.run(
+            ["tmux", "rename-window", new_name],
+            timeout=1,
+            check=False,
+        )
+    except (subprocess.TimeoutExpired, OSError):
+        pass
+
+
 def notify(title: str, message: str, urgency: str = "normal") -> bool:
     """Send desktop notification via notify-send.
 
@@ -94,6 +125,11 @@ def notify(title: str, message: str, urgency: str = "normal") -> bool:
     # Expire time based on urgency (ms): critical=persistent, normal=10s, low=5s
     expire_map = {"critical": 0, "normal": 10000, "low": 5000}
     expire_time = expire_map.get(urgency, 10000)
+
+    # Set emoji indicator on tmux window
+    emoji_map = {"critical": "🔴", "normal": "⏳", "low": "✅"}
+    if emoji := emoji_map.get(urgency):
+        _set_tmux_window_emoji(emoji)
 
     try:
         subprocess.run(
