@@ -95,17 +95,31 @@ def main() -> None:
         project_type = "go"
         output_lines.append("**Project type:** Go project")
         output_lines.append("")
-        output_lines.append("**Linter enforces:**")
-        output_lines.append("- `userID` not `userId` (var-naming)")
-        output_lines.append("- `any` not `interface{}` (use-any)")
-        output_lines.append("- No `common/helpers/utils/shared/misc` packages")
-        output_lines.append("")
+
+        # Inject mandatory Go guidelines
+        guidelines_path = (
+            Path(__file__).parent.parent.parent / "skills/go/go-development/GO-GUIDELINES.md"
+        )
+        if guidelines_path.exists():
+            guidelines = guidelines_path.read_text().strip()
+            output_lines.append("## ⛔ MANDATORY - Follow these rules")
+            output_lines.append("")
+            output_lines.append(guidelines)
+            output_lines.append("")
+        else:
+            # Fallback if file not found
+            output_lines.append("**Linter enforces:**")
+            output_lines.append("- `userID` not `userId` (var-naming)")
+            output_lines.append("- `any` not `interface{}` (use-any)")
+            output_lines.append("- No `common/helpers/utils/shared/misc` packages")
+            output_lines.append("")
+            output_lines.append("→ Run `golangci-lint run` after completing Go tasks")
+            output_lines.append("")
+
         output_lines.append("- Dependencies: always use `@latest` (hook enforces)")
         output_lines.append(
             "- Repository queries: use Filter pattern (`XxxFilter` + `getXxxCondition()`)"
         )
-        output_lines.append("")
-        output_lines.append("→ Run `golangci-lint run` after completing Go tasks")
         output_lines.append("")
 
     elif types["python"]:
