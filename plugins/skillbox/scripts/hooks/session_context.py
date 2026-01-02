@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from lib.detector import detect_project_types, detect_tdd_mode
 from lib.response import session_output
+from lib.tmux_state import save_state as save_tmux_state
 
 
 def check_command_exists(cmd: str) -> bool:
@@ -58,6 +59,9 @@ def get_beads_ready() -> str | None:
 def main() -> None:
     cwd = Path.cwd()
     output_lines: list[str] = []
+
+    # 0. Save tmux state for consistent targeting in notification hooks
+    save_tmux_state()
 
     # 1. Current date
     today = datetime.now().strftime("%Y-%m-%d")

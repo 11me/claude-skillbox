@@ -1,37 +1,21 @@
 #!/usr/bin/env python3
-"""Clear emoji from tmux window name when user submits prompt."""
+"""Clear emoji from tmux window name when user submits prompt or uses a tool.
+
+Uses saved tmux state for consistent targeting across panes.
+"""
 
 import json
-import os
-import subprocess
+import sys
+from pathlib import Path
+
+# Add lib to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from lib.notifier import clear_tmux_window_emoji  # noqa: E402
 
 
 def main() -> None:
-    if "TMUX" not in os.environ:
-        print(json.dumps({}))
-        return
-
-    try:
-        # Get current window name
-        result = subprocess.run(
-            ["tmux", "display-message", "-p", "#{window_name}"],
-            capture_output=True,
-            text=True,
-            timeout=1,
-        )
-        if result.returncode == 0:
-            current_name = result.stdout.strip()
-            # Remove emoji prefix (🔴, ⏳, ✅)
-            clean_name = current_name.lstrip("🔴⏳✅ ")
-            if clean_name != current_name:
-                subprocess.run(
-                    ["tmux", "rename-window", clean_name],
-                    timeout=1,
-                    check=False,
-                )
-    except (subprocess.TimeoutExpired, OSError):
-        pass
-
+    clear_tmux_window_emoji()
     print(json.dumps({}))
 
 
