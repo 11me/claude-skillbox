@@ -52,6 +52,15 @@
         ]
       },
       {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/tmux-set-emoji-fast.sh ❓"
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
