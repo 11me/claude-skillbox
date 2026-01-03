@@ -29,17 +29,39 @@ def _run_tmux(args: list[str], timeout: int = 1) -> str | None:
 
 
 def get_current_pane_id() -> str | None:
-    """Get current pane ID from tmux (e.g., %5)."""
+    """Get current pane ID from tmux (e.g., %5).
+
+    Uses TMUX_PANE env var (reliable) with fallback to display-message.
+    """
+    # TMUX_PANE is set by tmux for shells - most reliable method
+    if pane_id := os.environ.get("TMUX_PANE"):
+        return pane_id
+    # Fallback (may return wrong pane if user switched windows)
     return _run_tmux(["display-message", "-p", "#{pane_id}"])
 
 
 def get_current_window_id() -> str | None:
-    """Get current window ID from tmux (e.g., @2)."""
+    """Get current window ID from tmux (e.g., @2).
+
+    Derives window ID from pane ID for accuracy.
+    """
+    # Get our pane ID first (reliable via TMUX_PANE)
+    pane_id = get_current_pane_id()
+    if pane_id:
+        # Query window ID for our specific pane
+        return _run_tmux(["display-message", "-t", pane_id, "-p", "#{window_id}"])
+    # Fallback (may return wrong window if user switched)
     return _run_tmux(["display-message", "-p", "#{window_id}"])
 
 
 def get_session_name() -> str | None:
-    """Get current session name."""
+    """Get current session name.
+
+    Derives session name from pane ID for accuracy.
+    """
+    pane_id = get_current_pane_id()
+    if pane_id:
+        return _run_tmux(["display-message", "-t", pane_id, "-p", "#{session_name}"])
     return _run_tmux(["display-message", "-p", "#{session_name}"])
 
 
