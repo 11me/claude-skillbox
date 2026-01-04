@@ -3,7 +3,7 @@
 > Specialized workflow layer for Claude Code — cross-session task tracking, semantic code memory, platform engineering patterns.
 
 [![CI](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml/badge.svg)](https://github.com/11me/claude-skillbox/actions/workflows/ci.yaml)
-[![Version](https://img.shields.io/badge/version-0.55.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
+[![Version](https://img.shields.io/badge/version-0.57.0-blue?style=flat-square)](https://github.com/11me/claude-skillbox/releases)
 [![Python](https://img.shields.io/badge/python-3.12+-blue?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet?style=flat-square&logo=anthropic)](https://docs.anthropic.com/en/docs/claude-code)
@@ -48,6 +48,7 @@ claude --plugin-dir ./plugins/skillbox
 | [discovery](plugins/skillbox/skills/core/discovery/) | Self-questioning system for novel insights |
 | [secrets-guardian](plugins/skillbox/skills/core/secrets-guardian/) | Multi-layered secrets protection (gitleaks, detect-secrets) |
 | [reliable-execution](plugins/skillbox/skills/core/reliable-execution/) | 4-layer persistence for context recovery |
+| [agent-harness](plugins/skillbox/skills/core/agent-harness/) | Long-running agent patterns: feature tracking, verification enforcement |
 
 ### Go Development
 
@@ -130,6 +131,10 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | `/ansible-scaffold` | Create Ansible project with proper structure |
 | `/ansible-validate` | Run lint and security checks on Ansible project |
 | `/notify` | Toggle desktop notifications for Claude events |
+| `/harness-init` | Initialize long-running agent harness with feature tracking |
+| `/harness-status` | Show harness feature progress and verification status |
+| `/harness-verify` | Run verification for features and update status |
+| `/harness-update` | Manually update feature status |
 
 ## Hooks
 
@@ -145,6 +150,9 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | stop-done-criteria | Stop | Quality gate: lint must run if Go files modified |
 | stop-tdd-check | Stop | TDD enforcement check on session completion |
 | notification | Notification | Desktop notifications via notify-send |
+| session_bootstrap | SessionStart | Detect first session, suggest harness initialization |
+| pretool-features-guard | PreToolUse | Protect features.json from direct modification |
+| stop-verification | Stop | Block session end if unverified features exist |
 
 ## When to Use Skillbox vs Official Plugins
 
@@ -159,6 +167,7 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | Scaffold Flux GitOps projects | `flux-gitops-scaffold` (skillbox) |
 | TDD workflow enforcement | `tdd-enforcer` (skillbox) |
 | Ansible project automation | `ansible-automation` (skillbox) |
+| Long-running multi-session features | `agent-harness` (skillbox) |
 
 ## Architecture
 
@@ -176,7 +185,8 @@ plugins/skillbox/
 │   │   ├── production-flow/     # Full development workflow
 │   │   ├── discovery/           # Self-questioning insights
 │   │   ├── secrets-guardian/    # Secrets protection
-│   │   └── reliable-execution/  # Context persistence
+│   │   ├── reliable-execution/  # Context persistence
+│   │   └── agent-harness/       # Long-running agent patterns
 │   ├── go/                      # Go development
 │   │   ├── go-development/      # Production patterns
 │   │   └── openapi-development/ # OpenAPI spec-first API development

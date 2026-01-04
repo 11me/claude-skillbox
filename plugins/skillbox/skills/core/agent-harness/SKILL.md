@@ -1,0 +1,213 @@
+---
+name: agent-harness
+description: Long-running agent patterns for multi-session work. Use when working on features that span multiple sessions, need verification tracking, or want to prevent premature task completion. Integrates with beads, serena, and existing checkpoint system.
+globs: ["**/.claude/harness.json", "**/.claude/features.json"]
+---
+
+# Long-Running Agent Harness
+
+Based on Anthropic's [Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) article.
+
+## Purpose / When to Use
+
+Use this skill when:
+- Starting a multi-session feature implementation
+- Need to track feature verification status
+- Want to prevent premature "victory" declarations
+- Resuming work after context reset
+
+## The Two-Agent Pattern
+
+```
+Session 1: INITIALIZER
+├── Bootstrap environment
+├── Create features.json
+├── Set up verification commands
+└── Hand off to coding sessions
+
+Sessions 2+: CODING AGENT
+├── Load harness state
+├── Implement features
+├── Run verification
+└── Update feature status
+```
+
+## Quick Start
+
+### First Session (Initializer)
+
+```bash
+# 1. Basic setup (if not done)
+/init-workflow
+
+# 2. Initialize harness
+/harness-init
+
+# Define features when prompted
+```
+
+### Subsequent Sessions (Coding)
+
+```bash
+# Check status
+/harness-status
+
+# Implement feature
+# ... write code ...
+
+# Mark as implemented
+/harness-update auth-login implemented
+
+# Run verification
+/harness-verify auth-login
+
+# Session end (blocked if unverified)
+```
+
+## Feature Lifecycle
+
+```
+pending → in_progress → implemented → verified
+                              ↓
+                           failed
+                              ↓
+                        (fix & retry)
+```
+
+## Key Concepts
+
+### JSON Over Markdown
+
+Features are tracked in `.claude/features.json` (not markdown) because:
+- "Model is less likely to inappropriately change or overwrite JSON files"
+- Clear schema prevents ambiguous states
+- Direct file modification is blocked by hook
+
+### Mandatory Verification
+
+Session end is blocked if features are implemented but not verified:
+- Prevents premature victory declarations
+- Ensures all features are tested before completion
+- Linked beads tasks auto-close on verification
+
+### Auto-Beads Integration
+
+When adding features:
+1. Beads task created automatically
+2. Status synced with feature status
+3. Task closed when feature verified
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/harness-init` | Initialize harness, create features |
+| `/harness-status` | Show feature progress |
+| `/harness-verify <id>` | Run verification, update status |
+| `/harness-update <id> <status>` | Manual status update |
+
+## Integration with Existing Tools
+
+| Tool | Role in Harness |
+|------|-----------------|
+| **Beads** | High-level task tracking (auto-linked) |
+| **Serena** | Code memory, architectural decisions |
+| **Checkpoints** | Session state snapshots |
+| **TDD Enforcer** | Code-level test coverage |
+| **Harness** | Feature-level verification tracking |
+
+**Layer Hierarchy:**
+- `/init-workflow` = Base layer (beads + serena)
+- `/harness-init` = Feature tracking layer on top
+
+## File Structure
+
+```
+.claude/
+├── harness.json      # Session history, project type
+├── features.json     # Feature list with status
+└── init-session.sh   # Bootstrap script
+```
+
+### features.json Schema
+
+```json
+{
+  "version": "1.0.0",
+  "features": [
+    {
+      "id": "auth-login",
+      "description": "User login with JWT",
+      "status": "verified",
+      "verification": "go test ./... -run TestAuthLogin",
+      "beads_id": "skills-abc123",
+      "last_verified": "2026-01-05T15:30:00",
+      "verification_output": "PASS"
+    }
+  ]
+}
+```
+
+## Patterns
+
+### Pattern: Multi-Session Feature
+
+**Session 1 (Initializer):**
+```bash
+/harness-init
+# Define: auth-login, auth-logout, user-profile
+```
+
+**Session 2:**
+```bash
+# Harness shows: Session #2, 0/3 verified
+/harness-update auth-login in_progress
+# Implement login...
+/harness-update auth-login implemented
+/harness-verify auth-login
+# ✅ verified
+```
+
+**Session 3:**
+```bash
+# Harness shows: Session #3, 1/3 verified
+# Continue with next feature...
+```
+
+### Pattern: Recovery After Failure
+
+```bash
+/harness-verify user-profile
+# ❌ failed: TestProfileUpdate assertion failed
+
+# Fix the bug...
+/harness-update user-profile in_progress
+# ... fix code ...
+/harness-update user-profile implemented
+/harness-verify user-profile
+# ✅ verified
+```
+
+## Guardrails
+
+**MUST:**
+- Initialize harness before multi-session work
+- Verify features before marking complete
+- Run `/harness-verify --implemented` before session end
+
+**NEVER:**
+- Skip verification step
+- Directly modify features.json (blocked by hook)
+- Declare victory without all features verified
+
+## Related Skills
+
+- **workflow-orchestration** — Task-to-code traceability
+- **beads-workflow** — Task tracking details
+- **tdd-enforcer** — Code-level testing
+- **context-engineering** — Context management
+- **reliable-execution** — Persistence patterns
+
+## Version History
+
+- 1.0.0 — Initial release (based on Anthropic article)
