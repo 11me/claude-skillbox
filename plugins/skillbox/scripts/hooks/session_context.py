@@ -4,6 +4,8 @@
 Provides:
 - Current date (critical for YAML generation)
 - Project type detection
+- Serena auto-activation instruction
+- Harness workflow rules (context reinforcement)
 - Beads tasks integration
 - Tool availability checks
 - GitOps rules reminder
@@ -17,10 +19,22 @@ from pathlib import Path
 # Add lib to path
 sys.path.insert(0, str(Path(__file__).parent))
 
+from lib.bootstrap import is_harness_initialized
 from lib.detector import detect_flux, detect_project_types, detect_tdd_mode
 from lib.response import session_output
 from lib.tmux_state import cleanup_stale_states
 from lib.tmux_state import save_state as save_tmux_state
+
+
+def get_harness_rules() -> list[str]:
+    """Get harness workflow rules for context reinforcement."""
+    return [
+        "## 🔄 Active Workflow Rules",
+        "- **Harness**: Check `/harness-status` before work, verify after features",
+        "- **Tasks**: Use beads (`bd create/update/close`) for tracking",
+        "- **Checkpoints**: Save with `/checkpoint` before risky operations",
+        "",
+    ]
 
 
 def get_serena_project_name(cwd: Path) -> str:
@@ -243,6 +257,10 @@ def main() -> None:
             output_lines.append("2. Minimal implementation to pass")
             output_lines.append("3. Refactor with tests passing")
         output_lines.append("")
+
+    # 5.5 Harness workflow rules (context reinforcement)
+    if is_harness_initialized(cwd):
+        output_lines.extend(get_harness_rules())
 
     # 6. GitOps rules reminder
     if project_type in ("helm", "gitops"):
