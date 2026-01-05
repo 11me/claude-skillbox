@@ -56,8 +56,18 @@ def is_allowed_path(file_path: str) -> bool:
     return False
 
 
-def has_active_beads_task() -> bool:
-    """Check if there's an in_progress beads task."""
+def has_active_beads_task() -> tuple[bool, str | None]:
+    """Check if there's an in_progress beads task.
+
+    Returns:
+        tuple: (has_task: bool, error: str | None)
+        - has_task: True if active task exists, False otherwise
+        - error: Error message if beads command failed, None on success
+
+    Note: This function implements FAIL-SAFE behavior - if we cannot verify
+    task status, we return (False, error) to BLOCK operations rather than
+    allowing them. This prevents bypassing task tracking on errors.
+    """
     try:
         result = subprocess.run(
             ["bd", "list", "--status", "in_progress", "--json"],
@@ -66,14 +76,20 @@ def has_active_beads_task() -> bool:
             timeout=5,
         )
         if result.returncode != 0:
-            # Beads not available or error - allow to not block
-            return True
+            # Fail safe: cannot verify task status, block operation
+            stderr = result.stderr.strip() if result.stderr else ""
+            return False, f"bd command failed (exit {result.returncode}): {stderr}"
 
         tasks = json.loads(result.stdout)
-        return len(tasks) > 0
-    except (subprocess.TimeoutExpired, FileNotFoundError, json.JSONDecodeError, OSError):
-        # On any error, allow operation to not block workflow
-        return True
+        return len(tasks) > 0, None
+    except subprocess.TimeoutExpired:
+        return False, "bd command timed out (5s)"
+    except FileNotFoundError:
+        return False, "bd command not found - is beads installed?"
+    except json.JSONDecodeError as e:
+        return False, f"bd returned invalid JSON: {e}"
+    except OSError as e:
+        return False, f"bd command error: {e}"
 
 
 def main() -> None:
@@ -107,30 +123,52 @@ def main() -> None:
         return
 
     # Check for active beads task
-    if has_active_beads_task():
+    has_task, error = has_active_beads_task()
+    if has_task:
         allow("PreToolUse")
         return
 
-    # Block: no active task
-    block(
-        reason="No active beads task",
-        event="PreToolUse",
-        context=(
-            "Workflow mode is active. Create or start a task before modifying code:\n\n"
-            "**Create new task:**\n"
-            "```bash\n"
-            'bd create --title "Description" -p 2\n'
-            "bd update <id> --status in_progress\n"
-            "```\n\n"
-            "**Start existing task:**\n"
-            "```bash\n"
-            "bd ready  # List available tasks\n"
-            "bd update <id> --status in_progress\n"
-            "```\n\n"
-            "**Priority levels:** 0=Critical, 1=High, 2=Medium (default), 3=Low, 4=Someday\n"
-            "(Use `-p 0-4` or `-p P0-P4`, NOT words like 'high' or 'low')"
-        ),
-    )
+    # Block: no active task or error verifying task status
+    if error:
+        # Beads command failed - block with error details
+        block(
+            reason=f"Cannot verify beads task status: {error}",
+            event="PreToolUse",
+            context=(
+                "**The beads command failed.** Fix the issue or create a task manually:\n\n"
+                f"**Error:** `{error}`\n\n"
+                "**Possible fixes:**\n"
+                "- Ensure beads is installed: `pip install beads` or `uv tool install beads`\n"
+                "- Initialize beads: `bd init`\n"
+                "- Check bd is in PATH\n\n"
+                "**Or create a task:**\n"
+                "```bash\n"
+                'bd create --title "Description" -p 2\n'
+                "bd update <id> --status in_progress\n"
+                "```"
+            ),
+        )
+    else:
+        # No error, just no active task
+        block(
+            reason="No active beads task",
+            event="PreToolUse",
+            context=(
+                "Workflow mode is active. Create or start a task before modifying code:\n\n"
+                "**Create new task:**\n"
+                "```bash\n"
+                'bd create --title "Description" -p 2\n'
+                "bd update <id> --status in_progress\n"
+                "```\n\n"
+                "**Start existing task:**\n"
+                "```bash\n"
+                "bd ready  # List available tasks\n"
+                "bd update <id> --status in_progress\n"
+                "```\n\n"
+                "**Priority levels:** 0=Critical, 1=High, 2=Medium (default), 3=Low, 4=Someday\n"
+                "(Use `-p 0-4` or `-p P0-P4`, NOT words like 'high' or 'low')"
+            ),
+        )
 
 
 if __name__ == "__main__":

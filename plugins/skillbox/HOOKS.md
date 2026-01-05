@@ -135,6 +135,46 @@ allow()
 echo '{}' | python3 plugins/skillbox/scripts/hooks/your_hook.py
 ```
 
+## Beads Task Enforcement
+
+The `pretool-beads-guard.py` hook enforces task-first workflow:
+
+### Behavior
+
+1. **Activation**: When `.beads/` directory exists or harness is initialized
+2. **Enforcement**: Blocks `Write`/`Edit` operations without active `in_progress` task
+3. **Fail-Safe**: If `bd` command fails, operations are **BLOCKED** (not allowed)
+
+### Error Handling Philosophy
+
+**Fail-Safe, Not Fail-Open:**
+
+```python
+# WRONG (fail-open) - bypasses protection on errors
+if result.returncode != 0:
+    return True  # Allows operation
+
+# CORRECT (fail-safe) - maintains protection on errors
+if result.returncode != 0:
+    return False, "error message"  # Blocks operation
+```
+
+### Allowed Paths (exempt from task requirement)
+
+- `.claude/`, `CLAUDE.md`
+- `.beads/`, `.gitignore`
+- `README.md`, `CHANGELOG.md`, `docs/`
+- `plugin.json`, `.claude-plugin/`
+- `.pre-commit-config.yaml`
+
+### Interruption Handling
+
+If `bd create` is interrupted:
+
+1. Agent MUST retry or ask user before proceeding
+2. Implementation without confirmed task is BLOCKED
+3. Session context shows warning when no active task
+
 ## Testing Hooks
 
 ```bash
@@ -146,6 +186,10 @@ echo '{}' | python3 plugins/skillbox/scripts/hooks/skill_suggester.py
 # Test PreToolUse hooks
 echo '{"tool_name": "Bash", "tool_input": {"command": "git push"}}' | \
   python3 plugins/skillbox/scripts/hooks/git-push-guard.py
+
+# Test beads guard (should block without active task)
+echo '{"tool_name": "Write", "tool_input": {"file_path": "/tmp/test.py"}}' | \
+  python3 plugins/skillbox/scripts/hooks/pretool-beads-guard.py
 
 # Run with Claude Code
 claude --plugin-dir ./plugins/skillbox

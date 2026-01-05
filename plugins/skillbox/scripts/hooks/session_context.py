@@ -37,6 +37,63 @@ def get_harness_rules() -> list[str]:
     ]
 
 
+def get_task_enforcement_rules() -> list[str]:
+    """Rules for task creation interruption handling.
+
+    These rules ensure agents don't bypass task tracking when
+    bd commands are interrupted or fail.
+    """
+    return [
+        "## ⚠️ Task Creation Enforcement",
+        "- If `bd create` is interrupted, MUST retry or ask user before proceeding",
+        "- Never start implementation without confirmed active task",
+        "- On any beads command failure, resolve before coding",
+        "- Write/Edit operations WILL BE BLOCKED without active in_progress task",
+        "",
+    ]
+
+
+def get_no_active_task_warning() -> str | None:
+    """Check if active task exists and return warning if not.
+
+    Returns a strong warning message if beads is initialized but
+    there's no task in in_progress status. This is a soft gate -
+    warns but doesn't block session start.
+    """
+    try:
+        result = subprocess.run(
+            ["bd", "list", "--status", "in_progress", "--json"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if result.returncode == 0:
+            import json
+
+            tasks = json.loads(result.stdout)
+            if tasks:
+                return None  # Has active task - all good
+
+        # No active task - return warning
+        return """## ⚠️ NO ACTIVE TASK
+
+Workflow mode is active but **no task is in progress**.
+
+**Before implementing anything, create or select a task:**
+```bash
+bd create --title "Your task description" -p 2
+bd update <id> --status in_progress
+```
+
+**Or view ready tasks:** `bd ready`
+
+> ⛔ Write/Edit operations will be BLOCKED until a task is active.
+"""
+    except Exception:
+        # Don't warn on error - the guard will catch it later
+        return None
+
+
 def get_serena_project_name(cwd: Path) -> str:
     """Get Serena project name from config or directory name."""
     config_path = cwd / ".serena" / "config.yaml"
@@ -261,6 +318,15 @@ def main() -> None:
     # 5.5 Harness workflow rules (context reinforcement)
     if is_harness_initialized(cwd):
         output_lines.extend(get_harness_rules())
+
+    # 5.6 Task enforcement rules and warning (when beads is active)
+    if beads_initialized:
+        output_lines.extend(get_task_enforcement_rules())
+
+        # Show warning if no active task
+        no_task_warning = get_no_active_task_warning()
+        if no_task_warning:
+            output_lines.append(no_task_warning)
 
     # 6. GitOps rules reminder
     if project_type in ("helm", "gitops"):
