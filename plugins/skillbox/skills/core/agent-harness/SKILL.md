@@ -3,7 +3,7 @@ name: agent-harness
 description: Long-running agent patterns for multi-session work. Use when working on features that span multiple sessions, need verification tracking, or want to prevent premature task completion. Integrates with beads, serena, and existing checkpoint system.
 globs: ["**/.claude/harness.json", "**/.claude/features.json"]
 allowed-tools: Read, Write, Bash
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Long-Running Agent Harness
@@ -245,6 +245,35 @@ When adding features:
 - Directly modify features.json (blocked by hook)
 - Declare victory without all features verified
 
+## Parallel Execution
+
+When working with independent tasks or sub-features:
+
+**ALWAYS run Task agents in PARALLEL** when:
+- Multiple independent code searches needed
+- Analyzing different parts of codebase
+- Running independent verifications
+- Exploring multiple approaches simultaneously
+
+**Example - Sequential (WRONG):**
+```
+Task(code-explorer) → wait → Task(code-architect) → wait → ...
+```
+
+**Example - Parallel (CORRECT):**
+```
+Task(code-explorer) ─┬─► Results
+Task(code-architect) ─┤
+Task(code-reviewer)  ─┘
+```
+
+**Implementation:**
+Send a SINGLE message with MULTIPLE Task tool calls - they execute in parallel.
+
+**Keep sequential when:**
+- Task B depends on result of Task A
+- Sequential ordering is required for correctness
+
 ## Related Skills
 
 - **workflow-orchestration** — Task-to-code traceability
@@ -255,5 +284,6 @@ When adding features:
 
 ## Version History
 
+- 1.2.0 — Add Parallel Execution guidelines for independent tasks
 - 1.1.0 — Add Supervisor-Worker pattern with feature-dev integration
 - 1.0.0 — Initial release (based on Anthropic article)
