@@ -166,7 +166,7 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "1.14.0"
+      version: "X.Y.Z"  # May be outdated
   values:
     installCRDs: false
 ```
@@ -181,7 +181,7 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "1.14.0"
+      version: "X.Y.Z"  # Verify via Context7
   install:
     crds: Skip
   upgrade:
@@ -231,6 +231,57 @@ kubectl kustomize infra/dev/cluster/controllers/cert-manager
 kubectl kustomize infra/dev/cluster/controllers
 ```
 
+## Version Updates During Refactoring
+
+When refactoring existing Flux repos, versions should be updated to current:
+
+### Detection
+
+During analysis, flag potentially outdated versions:
+- Components with versions older than 6 months
+- Known deprecated versions (check release notes)
+- Missing version field (rare but possible)
+
+### Update Workflow
+
+For each HelmRelease with version field:
+
+```
+# Step 1: Resolve library ID
+Tool: resolve-library-id
+libraryName: "{component-name}"
+
+# Step 2: Get current version
+Tool: query-docs
+libraryId: "/{org}/{project}"
+topic: "helm chart latest version"
+
+# Step 3: Compare and update if needed
+```
+
+### Migration Report
+
+Include version updates in refactoring report:
+
+```markdown
+## Version Updates
+
+| Component | Old Version | New Version | Notes |
+|-----------|-------------|-------------|-------|
+| cert-manager | v1.14.0 | v1.17.0 | CRD changes - test required |
+| ingress-nginx | 4.8.0 | 4.12.0 | Check deprecated annotations |
+```
+
+### CRD Re-Vendoring
+
+When updating versions, re-vendor CRDs:
+
+```bash
+# Use Context7 to get {VERSION} first!
+curl -sL https://github.com/cert-manager/cert-manager/releases/download/{VERSION}/cert-manager.crds.yaml \
+  > infra/crds/cert-manager/crds.yaml
+```
+
 ## Target Structure Reference
 
 The target structure follows `flux-gitops-scaffold` pattern. Consult:
@@ -249,6 +300,7 @@ Before completing refactoring:
 - [ ] Aggregator `kustomization.yaml` in each directory
 - [ ] Flux Kustomizations have proper `dependsOn` chain
 - [ ] `kubectl kustomize` passes for all paths
+- [ ] **Versions verified via Context7** (not copied from old manifests)
 
 ## Additional Resources
 

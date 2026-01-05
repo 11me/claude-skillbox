@@ -393,37 +393,62 @@ For HelmReleases with CRDs, disable CRD installation:
 installCRDs: false
 ```
 
-## Version Management (REQUIRED)
+## Version Management (MANDATORY)
 
 **CRITICAL:** Never hardcode versions. Always use Context7 to get current versions.
 
-**Enforcement:** A PreToolUse hook blocks HelmRelease writes with empty version fields.
+### Enforcement Layers
 
-### Workflow (Mandatory)
+1. **SessionStart hook** — Reminds about Context7 when k8s/Flux project detected
+2. **PreToolUse hook** — Checks versions in HelmRelease files:
+   - Empty version (`version: ""`) → Blocks and requires Context7
+   - Hardcoded version (`version: "1.2.3"`) → Asks for verification
+3. **Documentation** — No hardcoded versions provided (only Context7 workflow)
+
+### Workflow (REQUIRED for every HelmRelease)
 
 Before creating ANY HelmRelease or vendoring CRDs:
 
 ```
 # Step 1: Resolve library ID
-resolve-library-id: libraryName="{component}"
+Tool: resolve-library-id
+Parameter: libraryName="{component}"
 
-# Step 2: Get docs with version info
-get-library-docs: context7CompatibleLibraryID="/{org}/{project}", topic="helm installation"
+# Step 2: Query docs for version
+Tool: query-docs
+Parameters:
+  libraryId: "/{org}/{project}"
+  topic: "helm chart installation version"
 
-# Step 3: Extract version and use in manifest
+# Step 3: Use version from documentation
 ```
 
 ### Example: cert-manager
 
 ```
-resolve-library-id: libraryName="cert-manager"
+Tool: resolve-library-id
+libraryName: "cert-manager"
 # Returns: /jetstack/cert-manager
 
-get-library-docs: context7CompatibleLibraryID="/jetstack/cert-manager", topic="installation"
-# Extract version from: "helm install cert-manager --version vX.Y.Z"
+Tool: query-docs
+libraryId: "/jetstack/cert-manager"
+topic: "helm installation version"
+# Extract version from documentation
 ```
 
-See `references/version-matrix.md` for Context7 queries per component.
+### Guardrails
+
+**NEVER:**
+- Copy versions from examples or documentation files
+- Use versions from memory or previous sessions
+- Hardcode versions without Context7 verification
+
+**ALWAYS:**
+- Fetch version via Context7 for EVERY new HelmRelease
+- Verify version is current before deployment
+- Use empty `version: ""` as placeholder until Context7 fetched
+
+See `references/version-matrix.md` for Context7 library IDs per component.
 
 ## Validation
 

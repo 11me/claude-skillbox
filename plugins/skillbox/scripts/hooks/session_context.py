@@ -17,7 +17,7 @@ from pathlib import Path
 # Add lib to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from lib.detector import detect_project_types, detect_tdd_mode
+from lib.detector import detect_flux, detect_project_types, detect_tdd_mode
 from lib.response import session_output
 from lib.tmux_state import cleanup_stale_states
 from lib.tmux_state import save_state as save_tmux_state
@@ -222,6 +222,19 @@ def main() -> None:
         output_lines.append("- No literal secrets in values.yaml (use ExternalSecret)")
         output_lines.append("- Use refreshPolicy: OnChange for deterministic ESO updates")
         output_lines.append("- Validate with /helm-validate before completing work")
+        output_lines.append("")
+
+    # 7. K8s/Flux version enforcement via Context7
+    is_flux = detect_flux(cwd)
+    if project_type in ("helm", "gitops") or is_flux:
+        output_lines.append("**Flux/K8s project detected**")
+        output_lines.append("   CRITICAL: Use Context7 for ALL Helm chart versions")
+        output_lines.append("   Workflow: resolve-library-id → query-docs")
+        output_lines.append(
+            "   Components: cert-manager, ingress-nginx, external-secrets, external-dns"
+        )
+        output_lines.append("   NEVER hardcode versions — always fetch from Context7")
+        output_lines.append("")
 
     session_output("\n".join(output_lines))
 
