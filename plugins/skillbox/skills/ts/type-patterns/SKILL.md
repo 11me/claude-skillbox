@@ -3,6 +3,7 @@ name: ts-type-patterns
 description: Advanced TypeScript type patterns for type-safe applications. Use when working with generics, utility types, type guards, conditional types, or template literals.
 globs: ["**/*.ts", "**/*.tsx"]
 allowed-tools: Read, Grep, Glob
+version: 1.0.0
 ---
 
 # TypeScript Type Patterns

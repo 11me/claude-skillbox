@@ -9,6 +9,7 @@ description: >
   flux-gitops-scaffold pattern.
 globs: ["**/clusters/**/*.yaml", "**/apps/**/*.yaml", "**/infra/**/*.yaml"]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+version: 1.0.0
 ---
 
 # Flux GitOps Refactor

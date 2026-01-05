@@ -2,6 +2,7 @@
 name: context-engineering
 description: Manage AI agent context windows effectively. Use when dealing with context overflow, token limits, context budget, progressive loading, or optimizing long sessions.
 allowed-tools: Read, Grep, Glob
+version: 1.0.0
 ---
 
 # Context Engineering — Maximizing AI Agent Effectiveness
@@ -164,6 +165,22 @@ Step 4: Load references as needed
 - Use TodoWrite to track task state
 - Summarize findings before moving on
 - Reference previous work instead of repeating
+
+## Trigger Examples
+
+Prompts that should activate this skill:
+- "My context is getting full, help me manage it"
+- "How do I prevent context overflow?"
+- "Summarize this session for handoff"
+- "What's the best way to load code progressively?"
+- "I keep forgetting earlier decisions"
+- "Response is getting shorter, what's happening?"
+
+## Related Skills
+
+- **unified-workflow** — Session persistence
+- **serena-navigation** — Memory persistence with serena
+- **discovery** — Managing discovery context
 
 ## Version History
 

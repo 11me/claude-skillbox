@@ -9,6 +9,7 @@ description: >
   image automation, and External Secrets integration.
 globs: ["**/clusters/**/*.yaml", "**/apps/**/*.yaml", "**/infra/**/*.yaml"]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+version: 1.0.0
 ---
 
 # Flux GitOps Scaffold

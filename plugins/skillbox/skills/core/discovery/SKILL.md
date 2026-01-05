@@ -1,6 +1,7 @@
 ---
 name: discovery
 description: Use when the user asks about "discover", "explore problem", "find insights", "analyze problem", "research", "investigate", "deep dive", or needs guidance on systematic self-questioning for novel problem-solving.
+allowed-tools: Read, Grep, Glob
 version: 1.0.0
 ---
 
@@ -222,8 +223,36 @@ Triggered by `--deep` flag or keywords: "architecture", "design", "scale", "syst
 
 ---
 
+## Guardrails
+
+**NEVER:**
+- Skip the questioning phase and jump to solutions
+- Ask obvious questions that waste reasoning capacity
+- Limit thinking to a single domain
+- Accept all constraints without questioning
+
+**MUST:**
+- Always generate questions before answering
+- Include cross-domain analogies (Tech + Business/UX)
+- Synthesize findings into actionable insights
+- Challenge hidden assumptions explicitly
+
+## Trigger Examples
+
+Prompts that should activate this skill:
+- "Help me discover the root cause of this bug"
+- "Explore this problem from different angles"
+- "What questions should I ask about this feature?"
+- "Deep dive into this architecture decision"
+- "Research approaches for handling..."
+- "Investigate why this is failing"
+
 ## Related Skills
 
 - **context-engineering** — Managing discovery context
-- **reliable-execution** — Persisting discoveries
+- **unified-workflow** — Persisting discoveries in workflow
 - **serena-navigation** — Exploring codebase for insights
+
+## Version History
+
+- 1.0.0 — Initial release (adapted from t3chn/skills)

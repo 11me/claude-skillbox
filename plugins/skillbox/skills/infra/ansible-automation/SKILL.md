@@ -16,6 +16,7 @@ globs:
   - "**/inventory/**"
   - "**/group_vars/**"
   - "**/host_vars/**"
+version: 1.0.0
 ---
 
 # Ansible Automation

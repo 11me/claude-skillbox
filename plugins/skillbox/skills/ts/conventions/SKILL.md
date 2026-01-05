@@ -1,8 +1,9 @@
 ---
 name: ts-conventions
-description: TypeScript project conventions and best practices for code review. Use when reviewing TypeScript code, checking conventions, or writing TypeScript.
-globs: ["**/*.ts", "**/*.tsx"]
-allowed-tools: Read, Grep, Glob
+description: TypeScript conventions, type-safe APIs (Hono, tRPC, Zod), and best practices. Use when reviewing TypeScript code, building APIs, checking conventions, or writing TypeScript.
+globs: ["**/*.ts", "**/*.tsx", "**/src/api/**", "**/routes/**"]
+allowed-tools: Read, Grep, Glob, Write, Edit
+version: 1.1.0
 ---
 
 # TypeScript Conventions
@@ -187,6 +188,115 @@ const [user, orders] = await Promise.all([
 - [ ] No hardcoded secrets or URLs
 - [ ] Discriminated unions for state
 
+## API Patterns
+
+### Hono — Edge-First Web Framework
+
+```typescript
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { zValidator } from '@hono/zod-validator';
+import { z } from 'zod';
+
+const createUserSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
+});
+
+const users = new Hono()
+  .get('/', async (c) => {
+    const users = await db.select().from(usersTable);
+    return c.json(users);
+  })
+  .post(
+    '/',
+    zValidator('json', createUserSchema),
+    async (c) => {
+      const body = c.req.valid('json'); // Fully typed!
+      const user = await createUser(body);
+      return c.json(user, 201);
+    }
+  );
+
+const app = new Hono()
+  .use('*', logger())
+  .use('*', cors())
+  .route('/users', users);
+
+export type AppType = typeof app;
+```
+
+### tRPC — End-to-End Type Safety
+
+```typescript
+// server/trpc.ts
+import { initTRPC, TRPCError } from '@trpc/server';
+import { z } from 'zod';
+
+const t = initTRPC.context<Context>().create();
+
+export const router = t.router;
+export const publicProcedure = t.procedure;
+
+export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
+  if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+  return next({ ctx: { user: ctx.user } });
+});
+
+// Router definition
+export const userRouter = router({
+  getByID: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const user = await findUser(input.id);
+      if (!user) throw new TRPCError({ code: 'NOT_FOUND' });
+      return user;
+    }),
+
+  create: protectedProcedure
+    .input(z.object({ name: z.string().min(1), email: z.string().email() }))
+    .mutation(async ({ input, ctx }) => {
+      return await createUser({ ...input, createdBy: ctx.user.id });
+    }),
+});
+```
+
+### Advanced Zod Patterns
+
+```typescript
+import { z } from 'zod';
+
+// Transforms
+const dateSchema = z.string().transform((str) => new Date(str));
+
+// Refinements
+const passwordSchema = z.string()
+  .min(8)
+  .refine((val) => /[A-Z]/.test(val), 'Must contain uppercase')
+  .refine((val) => /[0-9]/.test(val), 'Must contain number');
+
+// Discriminated Union
+const responseSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('success'), data: userSchema }),
+  z.object({ status: z.literal('error'), error: z.string() }),
+]);
+
+// Coercion for query params
+const querySchema = z.object({
+  page: z.coerce.number().default(1),
+  limit: z.coerce.number().default(10),
+});
+```
+
+## Related Skills
+
+- **ts-project-setup** — Project structure and tooling
+- **ts-database-patterns** — Drizzle ORM patterns
+- **ts-testing-patterns** — Vitest testing
+- **ts-type-patterns** — Advanced TypeScript types
+
 ## Version History
 
+- 1.1.0 — Merged api-patterns (Hono, tRPC, advanced Zod)
 - 1.0.0 — Initial release (adapted from t3chn/skills)

@@ -2,6 +2,8 @@
 name: agent-harness
 description: Long-running agent patterns for multi-session work. Use when working on features that span multiple sessions, need verification tracking, or want to prevent premature task completion. Integrates with beads, serena, and existing checkpoint system.
 globs: ["**/.claude/harness.json", "**/.claude/features.json"]
+allowed-tools: Read, Write, Bash
+version: 1.1.0
 ---
 
 # Long-Running Agent Harness

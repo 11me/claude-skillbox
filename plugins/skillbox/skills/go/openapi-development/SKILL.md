@@ -12,6 +12,7 @@ triggers:
   - /openapi
   - "generate OpenAPI"
   - "create API spec"
+version: 1.0.0
 ---
 
 # OpenAPI Development

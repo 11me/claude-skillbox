@@ -3,6 +3,7 @@ name: serena-navigation
 description: Semantic code navigation with Serena MCP. Use when working with serena, semantic code navigation, find symbol, code exploration, symbol search, find references, or serena memory persistence.
 globs: ["**/.serena/**"]
 allowed-tools: Read, Grep, Glob
+version: 1.0.0
 ---
 
 # Serena Navigation — Semantic Code Intelligence

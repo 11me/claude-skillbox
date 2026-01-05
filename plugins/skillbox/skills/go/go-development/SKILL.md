@@ -20,6 +20,23 @@ triggers:
 
 Production-ready patterns extracted from real projects.
 
+## Table of Contents
+
+- [Core Principle: LESS CODE = FEWER BUGS](#core-principle-less-code--fewer-bugs)
+- [Architecture Decisions](#architecture-decisions)
+- [Linter Enforcement](#linter-enforcement)
+- [Enforced Project Structure](#enforced-project-structure)
+- [References](#references)
+  - [Core Patterns](#core-patterns)
+  - [HTTP Layer](#http-layer)
+  - [Production Patterns](#production-patterns)
+  - [Best Practices](#best-practices)
+- [Examples](#examples)
+- [Templates](#templates)
+- [Commands](#commands)
+- [Dependencies](#dependencies)
+- [Version](#version)
+
 ## Core Principle: LESS CODE = FEWER BUGS
 
 **This applies to ALL code — not just project scaffolding.**

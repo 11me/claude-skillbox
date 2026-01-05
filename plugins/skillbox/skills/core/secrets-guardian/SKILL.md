@@ -267,7 +267,34 @@ jobs:
 
 ---
 
+## Definition of Done
+
+Before completing secrets protection setup:
+- [ ] `.pre-commit-config.yaml` exists with gitleaks hook
+- [ ] `.secrets.baseline` created (for detect-secrets)
+- [ ] `.gitignore` includes all secret patterns
+- [ ] `pre-commit install` completed
+- [ ] Initial scan with `gitleaks detect` shows no secrets
+
+## Guardrails
+
+**NEVER:**
+- Commit files matching secret patterns (`.env`, `*.key`, `credentials.*`)
+- Bypass pre-commit hooks with `--no-verify`
+- Store secrets in version control, even encrypted
+- Ignore secrets found in scan output
+
+**MUST:**
+- Always check for `.pre-commit-config.yaml` in new projects
+- Rotate any accidentally committed credentials immediately
+- Scan before first commit in any project
+- Update baseline only for verified false positives
+
 ## Related Skills
 
-- **production-flow** — Includes secrets protection in setup
-- **reliable-execution** — Checkpoint before risky operations
+- **unified-workflow** — Includes secrets protection in setup
+- **conventional-commit** — Safe commit workflow
+
+## Version History
+
+- 1.0.0 — Initial release
