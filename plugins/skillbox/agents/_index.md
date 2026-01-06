@@ -13,6 +13,7 @@ Autonomous agents for specialized tasks. Each agent has its own model, tools, an
 | [code-navigator](core/code-navigator.md) | sonnet | Semantic code navigation | "find where X is", "explore codebase" |
 | [feature-supervisor](core/feature-supervisor.md) | haiku | Orchestrate harness feature development | `/harness-supervisor`, "continue feature work" |
 | [verification-worker](core/verification-worker.md) | sonnet | Verify features with RCA and retry | Invoked by feature-supervisor |
+| [discovery-explorer](core/discovery-explorer.md) | sonnet | Deep 4-phase problem exploration | `/discover --depth deep`, "architecture", "design" |
 
 ### TDD
 

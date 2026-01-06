@@ -14,10 +14,10 @@ $ARGUMENTS
 ## Depth Detection
 
 Analyze the problem complexity:
-- **Quick** (default): Simple optimization, single-concern problems → 3-5 questions
-- **Deep**: Architecture decisions, multi-system problems → full 4-phase exploration
+- **Quick** (default): Simple optimization, single-concern problems -> 3-5 questions
+- **Deep**: Architecture decisions, multi-system problems -> launch discovery-explorer agent
 
-If `--deep` is specified OR problem contains keywords like "architecture", "design", "scale", "system", "pattern" → use deep mode.
+If `--depth deep` is specified OR problem contains keywords like "architecture", "design", "scale", "system", "pattern" -> use deep mode.
 
 ## Quick Mode Workflow
 
@@ -54,33 +54,18 @@ Combine your findings into:
 2. **Recommendation**: Concrete next step based on questioning
 3. **Alternative Frame**: A different way to think about the problem
 
-## Deep Mode (4-Phase Exploration)
+## Deep Mode
 
-If deep mode triggered, perform all 4 phases:
+If deep mode triggered, use the Task tool to launch the discovery-explorer agent:
 
-### Phase 1: Decomposition
-Break the problem into sub-questions:
-- What are the core components?
-- What dependencies exist?
-- What's the minimum viable solution?
-
-### Phase 2: Cross-Domain
-Find analogies from other fields:
-- How does [other domain] solve this?
-- What patterns from [framework X] apply?
-- What would a [different role] think?
-
-### Phase 3: Challenge
-Question hidden assumptions:
-- What if the opposite were true?
-- What constraint is artificial?
-- What would an expert in [other field] notice?
-
-### Phase 4: Synthesis
-Combine insights into:
-- Novel solution with trade-offs
-- Concrete next steps
-- Alternative perspectives
+```
+Launch discovery-explorer agent with the full problem context.
+The agent will perform multi-phase exploration:
+1. Decomposition into sub-questions
+2. Cross-domain analogy search
+3. Assumption challenging
+4. Insight synthesis
+```
 
 ## Output Format
 

@@ -45,7 +45,7 @@ claude --plugin-dir ./plugins/skillbox
 | [conventional-commit](plugins/skillbox/skills/core/conventional-commit/) | Structured commit messages |
 | [context-engineering](plugins/skillbox/skills/core/context-engineering/) | Long-session context management |
 | [production-flow](plugins/skillbox/skills/core/production-flow/) | Unified development workflow (INIT→PLAN→DEVELOP→VERIFY→REVIEW→SHIP) |
-| [discovery](plugins/skillbox/skills/core/discovery/) | Self-questioning system for novel insights |
+| [discovery](plugins/skillbox/skills/core/discovery/) | Self-questioning + Ralph pattern loop for deep research |
 | [secrets-guardian](plugins/skillbox/skills/core/secrets-guardian/) | Multi-layered secrets protection (gitleaks, detect-secrets) |
 | [reliable-execution](plugins/skillbox/skills/core/reliable-execution/) | 4-layer persistence for context recovery |
 | [agent-harness](plugins/skillbox/skills/core/agent-harness/) | Long-running agent patterns: feature tracking, verification enforcement |
@@ -102,6 +102,7 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | [code-navigator](plugins/skillbox/agents/core/code-navigator.md) | sonnet | Semantic code exploration |
 | [feature-supervisor](plugins/skillbox/agents/core/feature-supervisor.md) | haiku | Orchestrate feature development with feature-dev |
 | [verification-worker](plugins/skillbox/agents/core/verification-worker.md) | sonnet | Verify features with RCA and retry |
+| [discovery-explorer](plugins/skillbox/agents/core/discovery-explorer.md) | sonnet | Deep 4-phase problem exploration |
 | [go-project-init](plugins/skillbox/agents/go/project-init.md) | sonnet | Scaffold Go projects with production patterns |
 | [go-test-generator](plugins/skillbox/agents/go/test-generator.md) | sonnet | Generate idiomatic Go tests |
 | [go-code-reviewer](plugins/skillbox/agents/go/code-reviewer.md) | sonnet | Review Go code against standards |
@@ -116,6 +117,8 @@ Autonomous agents for specialized tasks. See [agents/_index.md](plugins/skillbox
 | `/checkpoint` | Save session progress to serena memory |
 | `/commit` | Create conventional commit message |
 | `/discover` | Self-questioning discovery for novel problem-solving |
+| `/discover-loop` | Iterative discovery with Ralph pattern (Stop hook continuation) |
+| `/cancel-discover-loop` | Cancel active discovery loop |
 | `/secrets-check` | Scan project for secrets and credentials |
 | `/helm-scaffold` | Scaffold GitOps structure for app |
 | `/helm-validate` | Validate Helm chart |
@@ -187,7 +190,7 @@ plugins/skillbox/
 │   │   ├── tdd-enforcer/
 │   │   ├── skill-patterns/
 │   │   ├── production-flow/     # Full development workflow
-│   │   ├── discovery/           # Self-questioning insights
+│   │   ├── discovery/           # Self-questioning + Ralph pattern loop
 │   │   ├── secrets-guardian/    # Secrets protection
 │   │   ├── reliable-execution/  # Context persistence
 │   │   └── agent-harness/       # Long-running agent patterns

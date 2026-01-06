@@ -18,7 +18,7 @@ Task tracking, code memory, session persistence, and commit traceability.
 | [serena-navigation](core/serena-navigation/) | Semantic code memory | "find symbol", "serena" |
 | [conventional-commit](core/conventional-commit/) | Structured commit messages | "commit", "git message" |
 | [context-engineering](core/context-engineering/) | Long-session context management | "context overflow", "token limit" |
-| [discovery](core/discovery/) | Self-questioning problem-solving | "discover", "explore", "research" |
+| [discovery](core/discovery/) | Self-questioning + Ralph pattern loop | "discover", "discover-loop", "research" |
 | [tdd-enforcer](core/tdd-enforcer/) | Red-Green-Refactor workflow | "tdd", "test first" |
 | [skill-patterns](core/skill-patterns/) | Do/Verify/Repair, Guardrails | "improve skill", "quality patterns" |
 | [secrets-guardian](core/secrets-guardian/) | Pre-commit secrets protection | "secrets", "gitleaks", "credentials" |
@@ -96,6 +96,8 @@ Server automation and hardening.
 | `/checkpoint` | Save session to serena memory |
 | `/commit` | conventional-commit |
 | `/discover` | discovery |
+| `/discover-loop` | discovery (Ralph pattern) |
+| `/cancel-discover-loop` | discovery |
 | `/secrets-check` | secrets-guardian |
 | `/helm-scaffold` | helm-chart-developer |
 | `/flux-init` | flux-gitops-scaffold |

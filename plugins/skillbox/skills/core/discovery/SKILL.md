@@ -1,8 +1,8 @@
 ---
 name: discovery
-description: Use when the user asks about "discover", "explore problem", "find insights", "analyze problem", "research", "investigate", "deep dive", or needs guidance on systematic self-questioning for novel problem-solving.
-allowed-tools: Read, Grep, Glob
-version: 1.0.0
+description: This skill should be used when the user asks about "discovery", "self-questioning", "SP-CoT", "novel insights", "systematic exploration", "hypothesis generation", "Socratic method", "deep research", or needs guidance on AI-powered discovery through systematic self-questioning.
+allowed-tools: [Read, Grep, Glob, WebSearch, WebFetch]
+version: 2.0.0
 ---
 
 # Self-Questioning Discovery System
@@ -18,7 +18,7 @@ Inspired by:
 
 ## Commands
 
-### `/discover <problem> [--deep]`
+### `/discover <problem> [--depth quick|deep]`
 
 Quick self-questioning for problem-solving.
 
@@ -26,8 +26,8 @@ Quick self-questioning for problem-solving.
 # Quick mode (default): 3-5 focused questions
 /discover "How to optimize this API endpoint?"
 
-# Deep mode: full 4-phase exploration
-/discover "Design a scalable notification system" --deep
+# Deep mode: triggers discovery-explorer agent
+/discover "Design a scalable notification system" --depth deep
 ```
 
 **Output:**
@@ -35,72 +35,31 @@ Quick self-questioning for problem-solving.
 2. Cross-domain analogies (Tech + Business/UX patterns)
 3. Novel insights and recommendations
 
----
+### `/discover-loop <research-question> [--max-iterations N]`
 
-## Quick Mode (default)
+Iterative discovery using Ralph-style loops. Continues until insight found or max iterations reached.
 
-### Phase 1: Generate Self-Questions
+```bash
+/discover-loop "Find optimal architecture for real-time collaboration" --max-iterations 10
+```
 
-Ask yourself these categories:
+**Completion signal:** `<discovered>INSIGHT_COMPLETE</discovered>`
 
-**Assumption Check:**
-- What am I assuming about this problem?
-- Which constraints are real vs perceived?
-- What would happen if I challenged the obvious solution?
+### `/cancel-discover-loop`
 
-**Cross-Domain (Tech):**
-- What existing pattern in [relevant framework] solves similar problems?
-- How would this scale to 10x the current load?
-- What's the simplest solution that could work?
+Cancel active discovery loop. Preserves findings in `.claude/discovery-findings.md`.
 
-**Cross-Domain (Business/UX):**
-- What would frustrate a user about the obvious approach?
-- How do successful products handle this?
-- What's the hidden cost of complexity here?
+## Agent
 
-### Phase 2: Answer Questions
+### discovery-explorer
 
-For each question, provide a brief insight. Look for:
-- Unexpected connections
-- Hidden assumptions that could be challenged
-- Analogies from other domains
+Deep exploration agent for complex problems. Automatically triggered by `/discover --depth deep`.
 
-### Phase 3: Synthesize
-
-Combine findings into:
-1. **Key Insight**: The most surprising/valuable discovery
-2. **Recommendation**: Concrete next step
-3. **Alternative Frame**: Different perspective
-
----
-
-## Deep Mode
-
-Triggered by `--deep` flag or keywords: "architecture", "design", "scale", "system", "pattern"
-
-### 4 Phases:
-
-1. **Decomposition**: Break problem into sub-questions
-   - What are the core components?
-   - What dependencies exist?
-   - What's the minimum viable solution?
-
+**Phases:**
+1. **Decomposition**: Break into sub-questions
 2. **Cross-Domain**: Find analogies from other fields
-   - How does [other domain] solve this?
-   - What patterns from [framework X] apply?
-   - What would a [role] think about this?
-
 3. **Challenge**: Question hidden assumptions
-   - What if the opposite were true?
-   - What constraint is artificial?
-   - What would an expert in [other field] notice?
-
-4. **Synthesis**: Combine insights
-   - What's the novel solution?
-   - What's the trade-off?
-   - What's the next step?
-
----
+4. **Synthesis**: Combine insights into novel solution
 
 ## Question Patterns
 
@@ -122,8 +81,6 @@ Triggered by `--deep` flag or keywords: "architecture", "design", "scale", "syst
 - What domain has solved a similar problem?
 - What would an expert in [other field] notice?
 
----
-
 ## Cross-Domain Triggers
 
 | Keyword | Explore |
@@ -134,42 +91,30 @@ Triggered by `--deep` flag or keywords: "architecture", "design", "scale", "syst
 | "error handling" | Resilience engineering, circuit breakers |
 | "auth" | OAuth flows, session patterns |
 | "data" | ETL patterns, data modeling |
-| "performance" | Profiling, async processing |
-| "security" | OWASP, threat modeling |
 
+## Loop Mechanism (Ralph Pattern)
+
+Uses Stop hook to create self-referential discovery loop:
+
+1. User initiates `/discover-loop "question"`
+2. Setup script creates state file `.claude/discovery-loop.local.md`
+3. Claude explores, generates questions, documents findings
+4. Stop hook checks for completion signal
+5. If not complete -> re-injects prompt with accumulated context
+6. Iterates until insight found or max iterations
+
+**State file format:**
+```yaml
 ---
-
-## Output Format
-
-```markdown
-## Self-Questions Generated
-
-1. [Question about assumptions]
-2. [Question about constraints]
-3. [Cross-domain question - Tech]
-4. [Cross-domain question - Business/UX]
-5. [Adversarial question - why might this fail?]
-
-## Insights
-
-### [Question 1]
-[Brief answer/insight]
-
-### [Question 2]
-[Brief answer/insight]
-
-...
-
-## Discovery Summary
-
-**Key Insight:** [Most valuable discovery]
-
-**Recommendation:** [Concrete next step]
-
-**Alternative Frame:** [Different perspective on the problem]
+active: true
+iteration: 1
+max_iterations: 10
+question_chain: []
+findings: []
+completion_signal: "<discovered>INSIGHT_COMPLETE</discovered>"
+---
+[Original research question]
 ```
-
----
 
 ## Anti-Patterns
 
@@ -179,8 +124,6 @@ Triggered by `--deep` flag or keywords: "architecture", "design", "scale", "syst
 | Ask obvious questions | Waste thinking time | Challenge assumptions |
 | Single-domain thinking | Limited perspective | Cross-domain analogies |
 | Accept constraints | Miss opportunities | Question every limit |
-
----
 
 ## Examples
 
@@ -195,33 +138,48 @@ Triggered by `--deep` flag or keywords: "architecture", "design", "scale", "syst
 4. What would a DBA notice? (cross-domain: query patterns)
 5. Why might optimization fail? (adversarial)
 
-**Key Insight:** 80% of requests are for the same 20 items — cache those.
+**Key Insight:** 80% of requests are for the same 20 items - cache those.
 
-### Example 2: Architecture Design
+### Example 2: Discovery Loop
 
-**Problem:** "Design notification system" (--deep)
+**Research Question:** "Find optimal data model for audit logs"
 
-**Phase 1 (Decomposition):**
-- What triggers notifications?
-- What channels needed? (email, push, SMS)
-- What's the delivery SLA?
+**Iteration 1:** Decompose - what are the access patterns?
+**Iteration 2:** Cross-domain - how do observability tools handle this?
+**Iteration 3:** Challenge - do we really need queryable logs?
+**Iteration 4:** Synthesis - append-only with time-partitioning
 
-**Phase 2 (Cross-Domain):**
-- How does Slack handle real-time?
-- How does Amazon handle millions of emails?
-- What patterns does Firebase use for push?
+**Key Insight:** Most audit queries are time-bounded - partition by time, not entity.
 
-**Phase 3 (Challenge):**
-- Do we really need real-time for all notifications?
-- What if we batch non-urgent ones?
-- Is eventual consistency acceptable?
+## Requirements
 
-**Phase 4 (Synthesis):**
-- Tiered system: urgent (real-time) vs batched (hourly digest)
-- Use message queue for durability
-- Start with email, add channels incrementally
+- `jq` - JSON processing (for transcript parsing in loop)
+- `perl` - regex extraction (for completion signal)
 
----
+Install on macOS: `brew install jq` (perl is pre-installed)
+
+## Files
+
+```
+discovery/
+├── SKILL.md                    # This file
+├── commands/
+│   ├── discover.md             # Quick discovery
+│   ├── discover-loop.md        # Loop variant (Ralph pattern)
+│   └── cancel-discover-loop.md # Cancel active loop
+├── agents/
+│   └── discovery-explorer.md   # Deep exploration agent
+└── scripts/
+    ├── setup-loop.sh           # Initialize loop state
+    ├── cancel-loop.sh          # Cancel loop
+    └── discovery-stop.sh       # Stop hook for loop continuation
+```
+
+## Related Skills
+
+- **context-engineering** - Managing discovery context
+- **unified-workflow** - Persisting discoveries in workflow
+- **serena-navigation** - Exploring codebase for insights
 
 ## Guardrails
 
@@ -237,22 +195,7 @@ Triggered by `--deep` flag or keywords: "architecture", "design", "scale", "syst
 - Synthesize findings into actionable insights
 - Challenge hidden assumptions explicitly
 
-## Trigger Examples
-
-Prompts that should activate this skill:
-- "Help me discover the root cause of this bug"
-- "Explore this problem from different angles"
-- "What questions should I ask about this feature?"
-- "Deep dive into this architecture decision"
-- "Research approaches for handling..."
-- "Investigate why this is failing"
-
-## Related Skills
-
-- **context-engineering** — Managing discovery context
-- **unified-workflow** — Persisting discoveries in workflow
-- **serena-navigation** — Exploring codebase for insights
-
 ## Version History
 
-- 1.0.0 — Initial release (adapted from t3chn/skills)
+- 2.0.0 - Added Ralph pattern loop, discovery-explorer agent, Stop hook integration
+- 1.0.0 - Initial release (quick/deep modes)

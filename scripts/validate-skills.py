@@ -21,7 +21,7 @@ except ImportError:
 
 
 # Valid tools that can be used in allowed-tools
-VALID_TOOLS = {"Read", "Write", "Edit", "Grep", "Glob", "Bash"}
+VALID_TOOLS = {"Read", "Write", "Edit", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"}
 
 # Name pattern: lowercase letters, numbers, hyphens
 NAME_PATTERN = re.compile(r"^[a-z0-9-]+$")
