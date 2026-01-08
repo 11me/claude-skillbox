@@ -1,5 +1,5 @@
 ---
-name: add-infra
+name: flux-add-infra
 description: Add infrastructure component (cert-manager, ingress-nginx, external-secrets, etc.) to GitOps project
 argument-hint: "<component-name>"
 allowed-tools:

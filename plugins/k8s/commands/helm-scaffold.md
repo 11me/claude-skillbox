@@ -1,5 +1,5 @@
 ---
-name: scaffold
+name: helm-scaffold
 description: Scaffold complete GitOps structure for a new application
 argument-hint: "<chart-name>"
 ---

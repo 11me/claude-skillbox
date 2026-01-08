@@ -1,5 +1,5 @@
 ---
-name: init
+name: flux-init
 description: Initialize a new Flux GitOps project with multi-environment structure
 argument-hint: "[project-name]"
 allowed-tools:

@@ -1,5 +1,5 @@
 ---
-name: refactor
+name: flux-refactor
 description: Refactor existing Flux GitOps repository to standard structure
 allowed-tools:
   - Read

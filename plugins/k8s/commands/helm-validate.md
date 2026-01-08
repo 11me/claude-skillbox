@@ -1,5 +1,5 @@
 ---
-name: validate
+name: helm-validate
 description: Validate Helm chart with all required checks
 argument-hint: "[chart-path]"
 ---

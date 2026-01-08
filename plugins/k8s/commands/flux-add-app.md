@@ -1,5 +1,5 @@
 ---
-name: add-app
+name: flux-add-app
 description: Add application to GitOps project with image automation
 argument-hint: "<app-name> [namespace]"
 allowed-tools:

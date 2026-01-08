@@ -75,7 +75,7 @@ Go development toolkit with production patterns.
 
 **Commands:** `/add-service`, `/add-repository`, `/add-model`, `/review`, `/openapi-init`, `/openapi-add-path`, `/openapi-generate`
 
-**Agents:** project-init, test-generator, code-reviewer
+**Agents:** project-init, code-reviewer
 
 ---
 
@@ -88,7 +88,7 @@ Kubernetes and GitOps toolkit.
 - `flux-gitops-scaffold` — Flux GitOps scaffolding
 - `flux-gitops-refactor` — Restructure existing GitOps repos
 
-**Commands:** `/helm-scaffold`, `/helm-validate`, `/helm-checkpoint`, `/flux-init`, `/flux-add-app`, `/flux-add-infra`, `/flux-refactor`
+**Commands:** `/flux-init`, `/flux-add-app`, `/flux-add-infra`, `/flux-refactor`, `/helm-scaffold`, `/helm-validate`, `/helm-checkpoint`
 
 ---
 
@@ -103,7 +103,7 @@ TypeScript development patterns.
 - `ts-testing-patterns` — Vitest
 - `ts-type-patterns` — Generics, utility types
 
-**Agents:** project-init, test-generator
+**Agents:** project-init
 
 ---
 
@@ -115,8 +115,6 @@ Test-Driven Development workflow.
 - `tdd-enforcer` — Red-Green-Refactor discipline
 
 **Commands:** `/tdd`
-
-**Agents:** tdd-coach, test-analyzer
 
 ---
 
@@ -146,7 +144,10 @@ Long-running agent patterns for multi-session features.
 
 Python development.
 
-**Agents:** test-writer (pytest patterns)
+**Skills:**
+- `testing-pytest` — pytest patterns, fixtures, mocking
+
+**Commands:** `/py-test`
 
 ---
 
@@ -154,7 +155,10 @@ Python development.
 
 Rust development.
 
-**Agents:** test-generator
+**Skills:**
+- `testing-patterns` — Rust testing, rstest, mockall
+
+**Commands:** `/rust-test`
 
 ## Architecture
 
@@ -185,7 +189,6 @@ plugins/
 ├── tdd/                     # TDD
 │   ├── .claude-plugin/
 │   ├── commands/
-│   ├── agents/
 │   └── skills/
 ├── infra/                   # Infrastructure
 │   ├── .claude-plugin/
@@ -197,10 +200,12 @@ plugins/
 │   └── skills/
 ├── python-dev/              # Python
 │   ├── .claude-plugin/
-│   └── agents/
+│   ├── commands/
+│   └── skills/
 └── rust-dev/                # Rust
     ├── .claude-plugin/
-    └── agents/
+    ├── commands/
+    └── skills/
 ```
 
 ## Development
