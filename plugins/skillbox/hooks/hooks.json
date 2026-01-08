@@ -75,8 +75,8 @@
             "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/git-push-guard.py"
           },
           {
-            "type": "prompt",
-            "prompt": "Tool input: $ARGUMENTS\n\nIf this is a 'go get' command, check version specification:\n1. No version (e.g., 'go get github.com/foo/bar') → suggest adding @latest\n2. @latest used → approve silently\n3. Specific version (e.g., @v1.2.3) → remind to verify it's the latest via Context7\n\nReturn empty response if not a 'go get' command or if @latest is used."
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/pretool-go-get-check.py"
           }
         ]
       },
@@ -124,8 +124,8 @@
         "matcher": "Write|Edit",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Tool input: $ARGUMENTS\n\nCheck if this Go file contains serializable transaction code (pgx.Serializable, ExecSerializable, or WithTx with Serializable level). If found, check if there's a Serialize() call inside the transaction block. If Serializable is used WITHOUT Serialize(), return a reminder:\n\n⚠️ Serializable transaction detected without Serialize() call.\nConsider using advisory lock to prevent serialization conflicts.\nPattern: repo.Serialize(ctx, \"OperationName:resourceID\")\nSee: advisory-lock-pattern.md\n\nReturn empty response if: not a Go file, no Serializable usage, or Serialize() is already present."
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/pretool-serializable-check.py"
           }
         ]
       }
