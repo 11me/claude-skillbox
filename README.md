@@ -59,7 +59,7 @@ Core workflow tools for cross-session development.
 - `secrets-guardian` — Secrets protection (gitleaks)
 - `discovery` — Self-questioning + Ralph pattern
 
-**Commands:** `/commit`, `/checkpoint`, `/discover`, `/loop`, `/init`, `/notify`, `/secrets`, `/scaffold`
+**Commands:** `/commit`, `/checkpoint`, `/discover`, `/discover-loop`, `/init`, `/notify`, `/secrets`, `/scaffold`
 
 **Agents:** task-tracker, session-checkpoint, code-navigator, feature-supervisor, verification-worker, discovery-explorer
 

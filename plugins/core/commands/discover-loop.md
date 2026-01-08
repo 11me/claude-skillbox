@@ -1,5 +1,5 @@
 ---
-name: loop
+name: discover-loop
 description: Iterative discovery loop for deep research (Ralph pattern)
 argument-hint: "<research-question> [--max-iterations N]"
 ---
