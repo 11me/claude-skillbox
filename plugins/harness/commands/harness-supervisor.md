@@ -1,5 +1,5 @@
 ---
-name: supervisor
+name: harness-supervisor
 description: Start supervised feature development with automatic orchestration
 allowed-tools:
   - Bash

@@ -1,5 +1,5 @@
 ---
-name: notify
+name: workflow-notify
 description: Toggle desktop notifications for Claude Code events
 ---
 

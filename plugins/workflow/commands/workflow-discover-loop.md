@@ -1,5 +1,5 @@
 ---
-name: discover-loop
+name: workflow-discover-loop
 description: Iterative discovery loop for deep research (Ralph pattern)
 argument-hint: "<research-question> [--max-iterations N]"
 ---

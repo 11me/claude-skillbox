@@ -1,5 +1,5 @@
 ---
-name: checkpoint
+name: workflow-checkpoint
 description: Save session progress to serena memory
 argument-hint: "[name]"
 ---

@@ -1,5 +1,5 @@
 ---
-name: auto
+name: harness-auto
 description: Toggle automatic supervisor mode for harness
 argument-hint: "[on|off]"
 allowed-tools:

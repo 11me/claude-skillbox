@@ -1,5 +1,5 @@
 ---
-name: add-model
+name: go-add-model
 description: Generate a new model with mapper for Go projects
 argument-hint: "<ModelName>"
 ---

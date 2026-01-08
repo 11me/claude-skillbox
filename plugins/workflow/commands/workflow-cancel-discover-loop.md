@@ -1,5 +1,5 @@
 ---
-name: cancel-discover-loop
+name: workflow-cancel-discover-loop
 description: Cancel active discovery loop
 ---
 

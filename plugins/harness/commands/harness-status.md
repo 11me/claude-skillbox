@@ -1,5 +1,5 @@
 ---
-name: status
+name: harness-status
 description: Show harness feature progress and verification status
 allowed-tools:
   - Read

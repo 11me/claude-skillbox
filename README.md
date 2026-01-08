@@ -60,7 +60,7 @@ Personal workflow tools for cross-session development.
 - `secrets-guardian` — Secrets protection (gitleaks)
 - `discovery` — Self-questioning + Ralph pattern
 
-**Commands:** `/commit`, `/checkpoint`, `/discover`, `/discover-loop`, `/init`, `/notify`, `/secrets`, `/scaffold`
+**Commands:** `/workflow-commit`, `/workflow-checkpoint`, `/workflow-discover`, `/workflow-discover-loop`, `/workflow-init`, `/workflow-notify`, `/workflow-secrets`, `/workflow-scaffold`
 
 **Agents:** task-tracker, session-checkpoint, code-navigator, feature-supervisor, verification-worker, discovery-explorer
 
@@ -74,7 +74,7 @@ Go development toolkit with production patterns.
 - `go-development` — Services, repositories, handlers, testing
 - `openapi-development` — Spec-first API with oapi-codegen
 
-**Commands:** `/add-service`, `/add-repository`, `/add-model`, `/review`, `/openapi-init`, `/openapi-add-path`, `/openapi-generate`
+**Commands:** `/go-add-service`, `/go-add-repository`, `/go-add-model`, `/go-review`, `/go-init`, `/go-add-path`, `/go-generate`
 
 **Agents:** project-init, code-reviewer
 
@@ -88,7 +88,7 @@ Flux GitOps toolkit.
 - `scaffold` — Flux GitOps project scaffolding
 - `refactor` — Restructure existing GitOps repos
 
-**Commands:** `/init`, `/add-app`, `/add-infra`, `/refactor`
+**Commands:** `/flux-init`, `/flux-add-app`, `/flux-add-infra`, `/flux-refactor`
 
 ---
 
@@ -99,7 +99,7 @@ Helm chart development toolkit.
 **Skills:**
 - `helm-dev` — Production Helm charts, External Secrets, GitOps patterns
 
-**Commands:** `/scaffold`, `/validate`, `/checkpoint`
+**Commands:** `/helm-scaffold`, `/helm-validate`, `/helm-checkpoint`
 
 ---
 
@@ -136,7 +136,7 @@ Ansible automation toolkit.
 **Skills:**
 - `ansible` — Ansible practices, Ubuntu hardening, SSH security
 
-**Commands:** `/scaffold`, `/validate`
+**Commands:** `/ansible-scaffold`, `/ansible-validate`
 
 ---
 
@@ -147,7 +147,7 @@ Long-running agent patterns for multi-session features.
 **Skills:**
 - `agent-harness` — Feature tracking, verification enforcement
 
-**Commands:** `/init`, `/supervisor`, `/status`, `/verify`, `/update`, `/auto`
+**Commands:** `/harness-init`, `/harness-supervisor`, `/harness-status`, `/harness-verify`, `/harness-update`, `/harness-auto`
 
 ---
 

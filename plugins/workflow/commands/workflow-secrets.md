@@ -1,5 +1,5 @@
 ---
-name: secrets-check
+name: workflow-secrets
 description: Scan project for secrets and credentials
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: scaffold
+name: ansible-scaffold
 description: Create new Ansible project with proper structure and optional baseline role
 argument-hint: "<project-name>"
 allowed-tools:

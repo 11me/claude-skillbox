@@ -1,5 +1,5 @@
 ---
-name: add-service
+name: go-add-service
 description: Generate a new service with factory method for Go projects
 argument-hint: "<ServiceName>"
 ---

@@ -1,5 +1,5 @@
 ---
-name: update
+name: harness-update
 description: Manually update feature status in harness
 argument-hint: "<feature-id> <status>"
 allowed-tools:

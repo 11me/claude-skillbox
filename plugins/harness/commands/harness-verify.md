@@ -1,5 +1,5 @@
 ---
-name: verify
+name: harness-verify
 description: Run verification for features and update status
 argument-hint: "<feature-id> | --implemented"
 allowed-tools:

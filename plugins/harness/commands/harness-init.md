@@ -1,5 +1,5 @@
 ---
-name: init
+name: harness-init
 description: Initialize long-running agent harness with bootstrap and feature tracking
 allowed-tools:
   - Bash

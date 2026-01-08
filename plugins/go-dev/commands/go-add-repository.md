@@ -1,5 +1,5 @@
 ---
-name: add-repository
+name: go-add-repository
 description: Generate a new repository with interface for Go projects
 argument-hint: "<EntityName>"
 ---

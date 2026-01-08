@@ -1,5 +1,5 @@
 ---
-name: add-path
+name: go-add-path
 description: Add a new resource path with CRUD operations to OpenAPI spec
 argument-hint: "<resource-name>"
 ---
