@@ -1,0 +1,8 @@
+{
+  "name": "flux",
+  "description": "Flux GitOps toolkit: project scaffolding, repository refactoring, multi-environment setup",
+  "version": "1.0.0",
+  "author": {
+    "name": "11me"
+  }
+}

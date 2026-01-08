@@ -1,8 +1,0 @@
-{
-  "name": "core",
-  "description": "Core workflow tools: beads task tracking, serena code navigation, conventional commits, discovery, context engineering",
-  "version": "1.0.3",
-  "author": {
-    "name": "11me"
-  }
-}

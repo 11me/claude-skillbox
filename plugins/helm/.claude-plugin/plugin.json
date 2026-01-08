@@ -1,0 +1,8 @@
+{
+  "name": "helm",
+  "description": "Helm chart development toolkit: production-ready charts, External Secrets integration, GitOps patterns",
+  "version": "1.0.0",
+  "author": {
+    "name": "11me"
+  }
+}

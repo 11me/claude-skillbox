@@ -14,12 +14,13 @@ Install only what you need:
 
 | Plugin | Description |
 |--------|-------------|
-| **[core](plugins/core/)** | Beads task tracking, Serena navigation, commits, discovery |
+| **[workflow](plugins/workflow/)** | Beads task tracking, Serena navigation, commits, discovery |
 | **[go-dev](plugins/go-dev/)** | Go development: services, repositories, OpenAPI |
-| **[k8s](plugins/k8s/)** | Kubernetes: Helm charts, Flux GitOps |
+| **[flux](plugins/flux/)** | Flux GitOps: scaffolding, refactoring, multi-environment |
+| **[helm](plugins/helm/)** | Helm chart development: ESO, GitOps patterns |
 | **[ts-dev](plugins/ts-dev/)** | TypeScript: Vitest, Drizzle, conventions |
 | **[tdd](plugins/tdd/)** | Test-Driven Development workflow |
-| **[infra](plugins/infra/)** | Ansible automation, Ubuntu hardening |
+| **[ansible](plugins/ansible/)** | Ansible automation, Ubuntu hardening |
 | **[harness](plugins/harness/)** | Long-running agent harness |
 | **[python-dev](plugins/python-dev/)** | Python test generation (pytest) |
 | **[rust-dev](plugins/rust-dev/)** | Rust test generation |
@@ -31,27 +32,27 @@ Install only what you need:
 /plugin marketplace add 11me/claude-skillbox
 
 # Install specific plugins
-/plugin install core@11me-skillbox
+/plugin install workflow@11me-skillbox
 /plugin install go-dev@11me-skillbox
-/plugin install k8s@11me-skillbox
+/plugin install flux@11me-skillbox
 ```
 
 Or test locally:
 
 ```bash
-claude --plugin-dir ./plugins/core
+claude --plugin-dir ./plugins/workflow
 claude --plugin-dir ./plugins/go-dev
 ```
 
 ## Plugin Details
 
-### core
+### workflow
 
-Core workflow tools for cross-session development.
+Personal workflow tools for cross-session development.
 
 **Skills:**
-- `beads-workflow` — Task tracking with beads CLI
-- `serena-navigation` — Semantic code navigation
+- `beads` — Task tracking with beads CLI
+- `serena` — Semantic code navigation
 - `conventional-commit` — Structured commit messages
 - `unified-workflow` — Complete task-to-commit workflow
 - `context-engineering` — Long-session context management
@@ -79,16 +80,26 @@ Go development toolkit with production patterns.
 
 ---
 
-### k8s
+### flux
 
-Kubernetes and GitOps toolkit.
+Flux GitOps toolkit.
 
 **Skills:**
-- `helm-chart-developer` — Production Helm charts
-- `flux-gitops-scaffold` — Flux GitOps scaffolding
-- `flux-gitops-refactor` — Restructure existing GitOps repos
+- `scaffold` — Flux GitOps project scaffolding
+- `refactor` — Restructure existing GitOps repos
 
-**Commands:** `/flux-init`, `/flux-add-app`, `/flux-add-infra`, `/flux-refactor`, `/helm-scaffold`, `/helm-validate`, `/helm-checkpoint`
+**Commands:** `/init`, `/add-app`, `/add-infra`, `/refactor`
+
+---
+
+### helm
+
+Helm chart development toolkit.
+
+**Skills:**
+- `helm-dev` — Production Helm charts, External Secrets, GitOps patterns
+
+**Commands:** `/scaffold`, `/validate`, `/checkpoint`
 
 ---
 
@@ -118,14 +129,14 @@ Test-Driven Development workflow.
 
 ---
 
-### infra
+### ansible
 
-Infrastructure automation.
+Ansible automation toolkit.
 
 **Skills:**
-- `ansible-automation` — Ansible practices, Ubuntu hardening
+- `ansible` — Ansible practices, Ubuntu hardening, SSH security
 
-**Commands:** `/ansible-scaffold`, `/ansible-validate`
+**Commands:** `/scaffold`, `/validate`
 
 ---
 
@@ -136,7 +147,7 @@ Long-running agent patterns for multi-session features.
 **Skills:**
 - `agent-harness` — Feature tracking, verification enforcement
 
-**Commands:** `/harness-init`, `/harness-supervisor`, `/harness-status`, `/harness-verify`, `/harness-update`, `/harness-auto`
+**Commands:** `/init`, `/supervisor`, `/status`, `/verify`, `/update`, `/auto`
 
 ---
 
@@ -164,7 +175,7 @@ Rust development.
 
 ```
 plugins/
-├── core/                    # Core workflows
+├── workflow/                # Personal workflow tools
 │   ├── .claude-plugin/
 │   ├── commands/
 │   ├── agents/
@@ -177,10 +188,15 @@ plugins/
 │   ├── agents/
 │   ├── skills/
 │   └── templates/
-├── k8s/                     # Kubernetes/GitOps
+├── flux/                    # Flux GitOps
 │   ├── .claude-plugin/
 │   ├── commands/
 │   └── skills/
+├── helm/                    # Helm charts
+│   ├── .claude-plugin/
+│   ├── commands/
+│   ├── skills/
+│   └── scripts/
 ├── ts-dev/                  # TypeScript
 │   ├── .claude-plugin/
 │   ├── agents/
@@ -190,7 +206,7 @@ plugins/
 │   ├── .claude-plugin/
 │   ├── commands/
 │   └── skills/
-├── infra/                   # Infrastructure
+├── ansible/                 # Ansible automation
 │   ├── .claude-plugin/
 │   ├── commands/
 │   └── skills/
@@ -220,7 +236,7 @@ uv tool install pre-commit
 pre-commit install
 
 # Test a plugin locally
-claude --plugin-dir ./plugins/core
+claude --plugin-dir ./plugins/workflow
 ```
 
 ## License

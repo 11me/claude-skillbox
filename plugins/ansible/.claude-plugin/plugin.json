@@ -1,0 +1,8 @@
+{
+  "name": "ansible",
+  "description": "Ansible automation toolkit: server provisioning, Ubuntu hardening, SSH security, playbook development",
+  "version": "1.0.0",
+  "author": {
+    "name": "11me"
+  }
+}
