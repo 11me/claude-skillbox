@@ -105,16 +105,6 @@
         ]
       },
       {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/skills/k8s/flux-gitops-scaffold/scripts/validate-flux-manifest.sh",
-            "timeout": 10
-          }
-        ]
-      },
-      {
         "matcher": "Write|Edit",
         "hooks": [
           {
@@ -140,16 +130,6 @@
           {
             "type": "command",
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/tmux-emoji-ops.sh clear"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/posttool-helm-version-check.py",
-            "timeout": 30
           }
         ]
       }
@@ -178,10 +158,6 @@
           {
             "type": "command",
             "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/stop-auto-checkpoint.py"
-          },
-          {
-            "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/stop-done-criteria.py"
           },
           {
             "type": "command",
