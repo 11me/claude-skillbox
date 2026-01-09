@@ -36,7 +36,10 @@ def has_tests(cwd: Path) -> bool:
 
 
 def detect_tdd_mode(cwd: Path) -> dict[str, bool]:
-    """Detect TDD mode status."""
+    """Detect TDD mode status.
+
+    Note: Keep in sync with workflow/scripts/hooks/lib/detector.py:detect_tdd_mode()
+    """
     result = {"enabled": False, "strict": False}
 
     config_path = cwd / ".claude" / "tdd-enforcer.local.md"

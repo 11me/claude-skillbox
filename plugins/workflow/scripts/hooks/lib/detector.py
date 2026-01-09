@@ -140,6 +140,8 @@ def detect_python_framework(cwd: Path | None = None) -> str | None:
 def detect_tdd_mode(cwd: Path | None = None) -> dict[str, bool]:
     """Detect TDD mode status.
 
+    Note: Keep in sync with tdd/scripts/hooks/session_context.py:detect_tdd_mode()
+
     Priority:
     1. Explicit config in .claude/tdd-enforcer.local.md
     2. Auto-detect by presence of test files
