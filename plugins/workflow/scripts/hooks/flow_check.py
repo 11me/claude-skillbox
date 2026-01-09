@@ -45,12 +45,7 @@ def main() -> None:
         output_lines.append("Missing: .pre-commit-config.yaml")
         missing_count += 1
 
-    # Check beads initialization (search up directory tree like bd CLI does)
-    from lib.detector import find_beads_dir
-
-    if not find_beads_dir(cwd):
-        output_lines.append("Missing: .beads/ (task tracking)")
-        missing_count += 1
+    # Skip beads check - session_context.py handles beads status with ready tasks
 
     # Check tests
     if not has_tests(cwd):

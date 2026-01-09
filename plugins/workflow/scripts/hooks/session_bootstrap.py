@@ -68,7 +68,7 @@ def main() -> None:
                 "2. Create `features.json` for tracking",
                 "3. Record bootstrap state for future sessions",
                 "",
-                "Or skip harness with `/init-workflow` for basic setup only.",
+                "Or skip harness with `/workflow-init` for basic setup only.",
             ]
         )
 
