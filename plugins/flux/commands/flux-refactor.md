@@ -28,7 +28,7 @@ Use AskUserQuestion to confirm:
 Execute the analysis script:
 
 ```bash
-python plugins/skillbox/skills/k8s/flux-gitops-refactor/scripts/analyze-structure.py /path/to/repo --format=markdown
+python ${CLAUDE_PLUGIN_ROOT}/skills/refactor/scripts/analyze-structure.py /path/to/repo --format=markdown
 ```
 
 Present analysis results to user showing:
@@ -125,5 +125,5 @@ configMapGenerator:
 
 ## References
 
-- Load `skills/k8s/flux-gitops-refactor/references/refactoring-patterns.md` for detailed patterns
-- Load `skills/k8s/flux-gitops-scaffold/references/project-structure.md` for target structure
+- See `skills/refactor/references/refactoring-patterns.md` for detailed patterns
+- See `skills/scaffold/references/project-structure.md` for target structure

@@ -80,7 +80,9 @@ Ask user for features to track. For each feature:
 Instead of using Write tool (blocked by guard hook), call initialization script:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/harness_init.py \
+# Find harness_init.py in workflow plugin (co-located with lib/)
+WORKFLOW_PLUGIN=$(dirname $(dirname ${CLAUDE_PLUGIN_ROOT}))/workflow
+python3 ${WORKFLOW_PLUGIN}/scripts/hooks/harness_init.py \
   --project-dir "$(pwd)" \
   --features '[
     {"id": "auth-login", "description": "User login with JWT"},

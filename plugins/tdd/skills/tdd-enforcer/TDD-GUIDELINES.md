@@ -36,4 +36,4 @@
 - Run tests after EVERY change
 - One test = one behavior
 
-→ Full reference: `skills/core/tdd-enforcer/SKILL.md`
+→ Full reference: tdd-enforcer skill

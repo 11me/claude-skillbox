@@ -184,5 +184,5 @@ This ensures:
 
 ## See Also
 
-- `skills/core/agent-harness/SKILL.md` — Full documentation
+- `agent-harness` skill — Full documentation
 - Anthropic article: "Effective Harnesses for Long-Running Agents"

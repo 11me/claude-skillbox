@@ -53,8 +53,8 @@ Create the following structure:
 
 ### Step 3: Generate Configuration Files
 
-1. **ansible.cfg** - Copy from `skills/infra/ansible-automation/examples/project-layout/ansible.cfg`
-2. **requirements.yml** - Copy from `skills/infra/ansible-automation/examples/project-layout/requirements.yml`
+1. **ansible.cfg** - Copy from `plugins/ansible/skills/ansible/examples/project-layout/ansible.cfg`
+2. **requirements.yml** - Copy from `plugins/ansible/skills/ansible/examples/project-layout/requirements.yml`
 
 3. **.ansible-lint**:
 ```yaml
@@ -99,17 +99,17 @@ For each environment, create:
 1. **hosts.yml** - Basic inventory structure
 2. **group_vars/all.yml** - Environment-specific variables
 
-Use `skills/infra/ansible-automation/examples/project-layout/inventories/` as templates.
+Use `plugins/ansible/skills/ansible/examples/project-layout/inventories/` as templates.
 
 ### Step 5: Create Main Playbook
 
-Create `playbooks/site.yml` from `skills/infra/ansible-automation/examples/playbooks/site.yml`.
+Create `playbooks/site.yml` from `plugins/ansible/skills/ansible/examples/playbooks/site.yml`.
 
 ### Step 6: Add Baseline Role (if requested)
 
 If user selected baseline role:
 
-1. Copy entire `skills/infra/ansible-automation/examples/baseline-role/` to `roles/baseline/`
+1. Copy entire `plugins/ansible/skills/ansible/examples/baseline-role/` to `roles/baseline/`
 2. Update variable prefix if project has specific naming
 
 ### Step 7: Add CI Pipeline (if requested)
