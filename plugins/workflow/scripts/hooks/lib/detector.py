@@ -3,6 +3,28 @@
 from pathlib import Path
 
 
+def find_beads_dir(cwd: Path | None = None) -> Path | None:
+    """Find .beads directory by searching up the directory tree.
+
+    This matches beads CLI behavior which auto-discovers the database
+    by walking up from cwd until finding .beads/ or hitting a boundary.
+
+    Returns:
+        Path to .beads directory if found, None otherwise.
+    """
+    cwd = cwd or Path.cwd()
+
+    for parent in [cwd, *cwd.parents]:
+        beads_dir = parent / ".beads"
+        if beads_dir.is_dir():
+            return beads_dir
+        # Stop at git root or home directory (boundaries)
+        if (parent / ".git").is_dir() or parent == Path.home():
+            break
+
+    return None
+
+
 def detect_project_types(cwd: Path | None = None) -> dict[str, bool]:
     """Detect project types based on marker files.
 
@@ -22,7 +44,7 @@ def detect_project_types(cwd: Path | None = None) -> dict[str, bool]:
         or (cwd / "setup.py").exists(),
         "node": (cwd / "package.json").exists(),
         "rust": (cwd / "Cargo.toml").exists(),
-        "beads": (cwd / ".beads").is_dir(),
+        "beads": find_beads_dir(cwd) is not None,
         "serena": (cwd / ".serena").is_dir(),
     }
 

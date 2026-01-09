@@ -41,9 +41,11 @@ ALLOWED_PATHS = [
 
 def is_workflow_active(project_dir: Path) -> bool:
     """Check if workflow mode is active (harness or beads)."""
+    from lib.detector import find_beads_dir
+
     if is_harness_initialized(project_dir):
         return True
-    if (project_dir / ".beads").is_dir():
+    if find_beads_dir(project_dir) is not None:
         return True
     return False
 

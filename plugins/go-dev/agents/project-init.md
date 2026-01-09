@@ -143,7 +143,7 @@ This agent uses patterns from `go-development` skill:
 - **Errors**: Typed errors (EntityNotFound, ValidationFailed, StateConflict)
 - **Logging**: slog (default) or zap (for large projects)
 
-See skill: `plugins/skillbox/skills/go/go-development/SKILL.md`
+See skill: `plugins/go-dev/skills/go-development/SKILL.md`
 
 ## Scaffolding Process
 
