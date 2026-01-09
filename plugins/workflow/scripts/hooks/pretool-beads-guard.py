@@ -41,9 +41,11 @@ ALLOWED_PATHS = [
 
 def is_workflow_active(project_dir: Path) -> bool:
     """Check if workflow mode is active (harness or beads)."""
+    from lib.detector import find_beads_dir
+
     if is_harness_initialized(project_dir):
         return True
-    if (project_dir / ".beads").is_dir():
+    if find_beads_dir(project_dir) is not None:
         return True
     return False
 
@@ -69,11 +71,14 @@ def has_active_beads_task() -> tuple[bool, str | None]:
     allowing them. This prevents bypassing task tracking on errors.
     """
     try:
+        # Let bd auto-discover the database - it handles worktrees and daemons
+        # Run from cwd which should be the main project directory
         result = subprocess.run(
             ["bd", "list", "--status", "in_progress", "--json"],
             capture_output=True,
             text=True,
             timeout=5,
+            cwd=Path.cwd(),  # Explicit cwd for clarity
         )
         if result.returncode != 0:
             # Fail safe: cannot verify task status, block operation

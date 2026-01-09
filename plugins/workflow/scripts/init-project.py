@@ -36,6 +36,14 @@ def init_beads(cwd: Path) -> None:
         print("  ✓ .beads/ already exists")
         return
 
+    # Check if beads exists in parent directory (worktree scenario)
+    for parent in cwd.parents:
+        if (parent / ".beads").is_dir():
+            print(f"  ✓ Using beads from parent: {parent / '.beads'}")
+            return
+        if (parent / ".git").is_dir():
+            break  # Stop at git root
+
     if not command_exists("bd"):
         print("  ⚠ beads CLI not found. Install: cargo install beads")
         return

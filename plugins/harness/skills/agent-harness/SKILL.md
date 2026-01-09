@@ -278,11 +278,10 @@ Send a SINGLE message with MULTIPLE Task tool calls - they execute in parallel.
 
 ## Related Skills
 
-- **workflow-orchestration** — Task-to-code traceability
+- **unified-workflow** — Complete workflow from task to delivery
 - **beads-workflow** — Task tracking details
 - **tdd-enforcer** — Code-level testing
 - **context-engineering** — Context management
-- **reliable-execution** — Persistence patterns
 
 ## Version History
 

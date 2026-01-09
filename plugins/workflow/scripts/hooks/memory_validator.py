@@ -313,6 +313,10 @@ def main():
     """Main entry point."""
     import argparse
 
+    # Add lib to path for session_output
+    sys.path.insert(0, str(Path(__file__).parent))
+    from lib.response import session_output
+
     parser = argparse.ArgumentParser(description="Validate memory consistency")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("--quiet", action="store_true", help="Only output if issues found")
@@ -327,11 +331,12 @@ def main():
 
         if args.json:
             output = format_json(result)
+            print(output)
         else:
             output = format_report(result)
-
-        if output:
-            print(output)
+            if output:
+                # Use session_output for proper hook formatting
+                session_output(output)
 
         sys.exit(0 if result.is_valid else 1)
 

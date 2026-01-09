@@ -3,6 +3,28 @@
 from pathlib import Path
 
 
+def find_beads_dir(cwd: Path | None = None) -> Path | None:
+    """Find .beads directory by searching up the directory tree.
+
+    This matches beads CLI behavior which auto-discovers the database
+    by walking up from cwd until finding .beads/ or hitting a boundary.
+
+    Returns:
+        Path to .beads directory if found, None otherwise.
+    """
+    cwd = cwd or Path.cwd()
+
+    for parent in [cwd, *cwd.parents]:
+        beads_dir = parent / ".beads"
+        if beads_dir.is_dir():
+            return beads_dir
+        # Stop at git root or home directory (boundaries)
+        if (parent / ".git").is_dir() or parent == Path.home():
+            break
+
+    return None
+
+
 def detect_project_types(cwd: Path | None = None) -> dict[str, bool]:
     """Detect project types based on marker files.
 
@@ -22,7 +44,7 @@ def detect_project_types(cwd: Path | None = None) -> dict[str, bool]:
         or (cwd / "setup.py").exists(),
         "node": (cwd / "package.json").exists(),
         "rust": (cwd / "Cargo.toml").exists(),
-        "beads": (cwd / ".beads").is_dir(),
+        "beads": find_beads_dir(cwd) is not None,
         "serena": (cwd / ".serena").is_dir(),
     }
 
@@ -66,7 +88,10 @@ def detect_flux(cwd: Path | None = None, max_depth: int = 3) -> bool:
 
 
 def has_tests(cwd: Path | None = None) -> bool:
-    """Check if project has tests."""
+    """Check if project has tests.
+
+    This is the canonical implementation - TDD plugin imports from here.
+    """
     cwd = cwd or Path.cwd()
 
     # Check test directories
@@ -74,10 +99,17 @@ def has_tests(cwd: Path | None = None) -> bool:
         if (cwd / test_dir).is_dir():
             return True
 
-    # Check test file patterns
-    patterns = ["*_test.go", "*_test.py", "*.test.ts", "*.spec.ts", "test_*.py"]
+    # Use recursive glob to find test files in subdirectories
+    patterns = [
+        "**/*_test.go",
+        "**/*_test.py",
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        "**/test_*.py",
+    ]
     for pattern in patterns:
-        if list(cwd.glob(pattern)):
+        # Use next() with default to short-circuit on first match
+        if next(cwd.glob(pattern), None) is not None:
             return True
 
     return False
@@ -107,6 +139,8 @@ def detect_python_framework(cwd: Path | None = None) -> str | None:
 
 def detect_tdd_mode(cwd: Path | None = None) -> dict[str, bool]:
     """Detect TDD mode status.
+
+    This is the canonical implementation - TDD plugin imports from here.
 
     Priority:
     1. Explicit config in .claude/tdd-enforcer.local.md

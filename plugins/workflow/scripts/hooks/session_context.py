@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from lib.bootstrap import is_harness_initialized
-from lib.detector import detect_flux, detect_project_types, detect_tdd_mode
+from lib.detector import detect_flux, detect_project_types
 from lib.response import session_output
 from lib.tmux_state import cleanup_stale_states
 from lib.tmux_state import save_state as save_tmux_state
@@ -191,32 +191,6 @@ def main() -> None:
         output_lines.append("**Project type:** Go project")
         output_lines.append("")
 
-        # Inject mandatory Go guidelines
-        guidelines_path = (
-            Path(__file__).parent.parent.parent / "skills/go/go-development/GO-GUIDELINES.md"
-        )
-        if guidelines_path.exists():
-            guidelines = guidelines_path.read_text().strip()
-            output_lines.append("## ⛔ MANDATORY - Follow these rules")
-            output_lines.append("")
-            output_lines.append(guidelines)
-            output_lines.append("")
-        else:
-            # Fallback if file not found
-            output_lines.append("**Linter enforces:**")
-            output_lines.append("- `userID` not `userId` (var-naming)")
-            output_lines.append("- `any` not `interface{}` (use-any)")
-            output_lines.append("- No `common/helpers/utils/shared/misc` packages")
-            output_lines.append("")
-            output_lines.append("→ Run `golangci-lint run` after completing Go tasks")
-            output_lines.append("")
-
-        output_lines.append("- Dependencies: always use `@latest` (hook enforces)")
-        output_lines.append(
-            "- Repository queries: use Filter pattern (`XxxFilter` + `getXxxCondition()`)"
-        )
-        output_lines.append("")
-
     elif types["python"]:
         project_type = "python"
         output_lines.append("**Project type:** Python project")
@@ -277,9 +251,11 @@ def main() -> None:
         output_lines.append(f"**Missing tools:** {' '.join(missing_tools)}")
         output_lines.append("")
 
-    # 4. Beads integration
+    # 4. Beads integration (search up directory tree like bd CLI does)
+    from lib.detector import find_beads_dir
+
     bd_installed = check_command_exists("bd")
-    beads_initialized = (cwd / ".beads").is_dir()
+    beads_initialized = find_beads_dir(cwd) is not None
 
     if bd_installed and beads_initialized:
         bd_ready = get_beads_ready()
@@ -294,32 +270,11 @@ def main() -> None:
         output_lines.append("→ Run `/init-project` for full setup, or `bd init` for beads only")
         output_lines.append("")
 
-    # 5. TDD mode detection and injection
-    tdd_status = detect_tdd_mode(cwd)
-    if tdd_status["enabled"]:
-        tdd_guidelines_path = (
-            Path(__file__).parent.parent.parent / "skills/core/tdd-enforcer/TDD-GUIDELINES.md"
-        )
-        mode_label = "STRICT" if tdd_status["strict"] else "ACTIVE"
-        output_lines.append(f"## 🧪 TDD Mode ({mode_label})")
-        output_lines.append("")
-
-        if tdd_guidelines_path.exists():
-            guidelines = tdd_guidelines_path.read_text().strip()
-            output_lines.append(guidelines)
-        else:
-            # Fallback if file not found
-            output_lines.append("**Cycle:** RED → GREEN → REFACTOR")
-            output_lines.append("1. Write failing test FIRST")
-            output_lines.append("2. Minimal implementation to pass")
-            output_lines.append("3. Refactor with tests passing")
-        output_lines.append("")
-
-    # 5.5 Harness workflow rules (context reinforcement)
+    # 5. Harness workflow rules (context reinforcement)
     if is_harness_initialized(cwd):
         output_lines.extend(get_harness_rules())
 
-    # 5.6 Task enforcement rules and warning (when beads is active)
+    # 6. Task enforcement rules and warning (when beads is active)
     if beads_initialized:
         output_lines.extend(get_task_enforcement_rules())
 
@@ -328,7 +283,7 @@ def main() -> None:
         if no_task_warning:
             output_lines.append(no_task_warning)
 
-    # 6. GitOps rules reminder
+    # 7. GitOps rules reminder
     if project_type in ("helm", "gitops"):
         output_lines.append("**Rules:**")
         output_lines.append("- No literal secrets in values.yaml (use ExternalSecret)")
@@ -336,7 +291,7 @@ def main() -> None:
         output_lines.append("- Validate with /helm-validate before completing work")
         output_lines.append("")
 
-    # 7. K8s/Flux version enforcement via Context7
+    # 8. K8s/Flux version enforcement via Context7
     is_flux = detect_flux(cwd)
     if project_type in ("helm", "gitops") or is_flux:
         output_lines.append("**Flux/K8s project detected**")

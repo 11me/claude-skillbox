@@ -12,10 +12,17 @@ from pathlib import Path
 # Add lib to path
 sys.path.insert(0, str(Path(__file__).parent))
 
+from lib.detector import detect_project_types
 from lib.response import allow, block
 
 
 def main() -> None:
+    # Fast-path: skip for non-Helm/GitOps projects
+    cwd = Path.cwd()
+    types = detect_project_types(cwd)
+    if not types.get("helm") and not types.get("gitops"):
+        return  # Exit silently - not a Helm project
+
     try:
         data = json.load(sys.stdin)
     except json.JSONDecodeError:

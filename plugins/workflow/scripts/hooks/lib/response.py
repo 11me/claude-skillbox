@@ -2,7 +2,12 @@
 
 import json
 
-from lib.notifier import notify
+try:
+    from .notifier import notify
+except ImportError:
+    # Fallback when imported from other plugins
+    def notify(title: str, message: str, urgency: str = "normal") -> None:
+        pass  # Silent fallback
 
 
 def session_output(message: str) -> None:

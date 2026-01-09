@@ -29,7 +29,7 @@ Create the directory structure and SKILL.md file for a new Agent Skill.
    - Must be unique in target location
 
 2. **Determine target directory**:
-   - `skillbox`: `plugins/skillbox/skills/<skill-name>/`
+   - `workflow`: `plugins/workflow/skills/<skill-name>/`
    - `personal`: `~/.claude/skills/<skill-name>/`
    - `project`: `.claude/skills/<skill-name>/`
 

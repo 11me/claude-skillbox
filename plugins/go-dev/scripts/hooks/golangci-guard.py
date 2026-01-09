@@ -6,15 +6,32 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
-from lib.response import allow, ask
+# Import response utilities from workflow plugin (avoid duplication)
+_workflow_lib = Path(__file__).parent.parent.parent.parent / "workflow/scripts/hooks/lib"
+if _workflow_lib.exists():
+    sys.path.insert(0, str(_workflow_lib))
+    from response import allow, ask
+else:
+    # Minimal fallback
+    def allow(event: str | None = None) -> None:
+        if event:
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": event}}))
+
+    def ask(reason: str, event: str = "PreToolUse", context: str | None = None) -> None:
+        output: dict = {
+            "hookSpecificOutput": {
+                "hookEventName": event,
+                "permissionDecision": "ask",
+                "permissionDecisionReason": reason,
+            }
+        }
+        if context:
+            output["hookSpecificOutput"]["additionalContext"] = context
+        print(json.dumps(output))
 
 
 def is_inside_plugin_dir(file_path: str) -> bool:
-    """Check if file is inside the skillbox plugin directory.
-
-    Uses CLAUDE_PLUGIN_ROOT env var provided by Claude Code.
-    """
+    """Check if file is inside the skillbox plugin directory."""
     plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT", "")
     if not plugin_root:
         return False
