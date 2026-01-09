@@ -7,59 +7,31 @@ TDD mode is detected via:
 """
 
 import json
+import sys
 from pathlib import Path
 
-
-def has_tests(cwd: Path) -> bool:
-    """Check if project has tests.
-
-    Note: Keep in sync with workflow/scripts/hooks/lib/detector.py:has_tests()
-    """
-    for test_dir in ["tests", "test", "__tests__", "spec"]:
-        if (cwd / test_dir).is_dir():
-            return True
-
-    # Use recursive glob to find test files in subdirectories
-    patterns = [
-        "**/*_test.go",
-        "**/*_test.py",
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "**/test_*.py",
-    ]
-    for pattern in patterns:
-        # Use next() with default to short-circuit on first match
-        if next(cwd.glob(pattern), None) is not None:
-            return True
-
-    return False
-
-
-def detect_tdd_mode(cwd: Path) -> dict[str, bool]:
-    """Detect TDD mode status.
-
-    Note: Keep in sync with workflow/scripts/hooks/lib/detector.py:detect_tdd_mode()
-    """
-    result = {"enabled": False, "strict": False}
-
-    config_path = cwd / ".claude" / "tdd-enforcer.local.md"
-    if config_path.exists():
-        try:
-            content = config_path.read_text(errors="ignore")
-            if "enabled: false" in content:
-                return result
-            if "enabled: true" in content:
-                result["enabled"] = True
-            if "strictMode: true" in content:
-                result["strict"] = True
-            return result
-        except OSError:
-            pass
-
-    if has_tests(cwd):
-        result["enabled"] = True
-
-    return result
+# Import shared detection utilities from workflow plugin
+# This avoids code duplication between plugins
+_workflow_lib = Path(__file__).parent.parent.parent.parent / "workflow/scripts/hooks/lib"
+if _workflow_lib.exists():
+    sys.path.insert(0, str(_workflow_lib))
+    from detector import detect_tdd_mode
+else:
+    # Fallback if workflow plugin not available
+    def detect_tdd_mode(cwd: Path) -> dict[str, bool]:
+        """Minimal fallback detection."""
+        result = {"enabled": False, "strict": False}
+        config_path = cwd / ".claude" / "tdd-enforcer.local.md"
+        if config_path.exists():
+            try:
+                content = config_path.read_text(errors="ignore")
+                if "enabled: true" in content:
+                    result["enabled"] = True
+                if "strictMode: true" in content:
+                    result["strict"] = True
+            except OSError:
+                pass
+        return result
 
 
 def main() -> None:

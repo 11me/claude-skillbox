@@ -1,7 +1,7 @@
 {
   "name": "tdd",
   "description": "Test-Driven Development: TDD workflow enforcement, test analysis, coaching for Go, TypeScript, Python, Rust",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "11me"
   }

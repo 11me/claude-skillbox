@@ -122,7 +122,10 @@ def get_default_verification_command(project_dir: Path, feature_id: str) -> str 
         )
 
     if project_type and project_type.startswith("python"):
-        return f"pytest -k {feature_id.replace('-', '_')}"
+        # Convert feature-id to CamelCase for class/test pattern matching
+        # e.g., link-dotfiles → LinkDotfiles (matches TestLinkDotfiles class)
+        camel_case = _to_test_pattern(feature_id)
+        return f"pytest -k {camel_case}"
 
     return None
 

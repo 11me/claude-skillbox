@@ -90,7 +90,7 @@ def detect_flux(cwd: Path | None = None, max_depth: int = 3) -> bool:
 def has_tests(cwd: Path | None = None) -> bool:
     """Check if project has tests.
 
-    Note: Keep in sync with tdd/scripts/hooks/session_context.py:has_tests()
+    This is the canonical implementation - TDD plugin imports from here.
     """
     cwd = cwd or Path.cwd()
 
@@ -140,7 +140,7 @@ def detect_python_framework(cwd: Path | None = None) -> str | None:
 def detect_tdd_mode(cwd: Path | None = None) -> dict[str, bool]:
     """Detect TDD mode status.
 
-    Note: Keep in sync with tdd/scripts/hooks/session_context.py:detect_tdd_mode()
+    This is the canonical implementation - TDD plugin imports from here.
 
     Priority:
     1. Explicit config in .claude/tdd-enforcer.local.md
